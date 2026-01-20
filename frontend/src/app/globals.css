@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+    --background: #ffffff;
+  --foreground: #171717;
+  --primary1: #424BD0;   /* //little darkish  */
+  --primary2: #0009FF;  /* //lightihst  */
+  --primary3: #b03937;  /* //lightihst  */
+  --primary4: #ab2320;  /* //lightihst  */
+  
+
+  font-family: var(--font-myfont);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background:white;
+  color: var(--foreground);
+ font-family: var(--font-myfont);
+ font-size: 16px;
+}
+a{
+  font-size: 1.2rem;
+}
+@keyframes scroll-up {
+  from {
+    /* Start at the top */
+    transform: translateY(0%);
+  }
+  to {
+    /* Move up exactly the height of one copy (1/3 of the 300% total height) */
+    transform: translateY(-22.33%); 
+  }
+}
+.animate-scroll-up-custom {
+    animation: scroll-up 40s linear infinite;
+}
+
+/* ------------ */
+@keyframes scroll-left {
+  from {
+    /* Start position: 0% translation */
+    transform: translateX(0);
+  }
+  to {
+    /* End position: Move left by the width of one set of duplicated logos */
+    transform: translateX(-50%); 
+  }
+}
+
+.team-section {
+  padding: 40px;
+}
+
+.team-header {
+  margin-bottom: 40px;
+}
+
+.team-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.team-header p {
+  color: #555;
+}
+html {
+  scroll-behavior: smooth;
+}
+
+.team-card {
+  padding: 10px;
+  text-align: left;
+}
+
+.team-img {
+  width: 100%;
+  height: 250px;
+  /* object-fit: cover; */
+  border-radius: 12px;
+
+  margin-bottom: 15px;
+  width: 250px;
+      object-fit: cover;
+    object-position: top;
+    height: 250px;
+}
+
+/* Fade effect */
+.fade-carousel .react-multi-carousel-item {
+  transition: opacity 1s ease-in-out;
+}
+.fade-carousel .react-multi-carousel-item:not(.react-multi-carousel-item--active) {
+  opacity: 0.3;
+}
+
+/* Firefox */
+.my-scroll {
+  scrollbar-width: thin; 
+  scrollbar-color: rgba(255, 255, 255, 0.4) transparent;  /* thumb + track */
+}
+
+/* Chrome, Edge, Safari */
+.my-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.my-scroll::-webkit-scrollbar-track {
+  background: transparent;    /* no white background */
+}
+
+.my-scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.25);  /* translucent thumb */
+  border-radius: 10px;
+  backdrop-filter: blur(8px);  /* blur effect */
+  -webkit-backdrop-filter: blur(8px);
+
+}
+
+.my-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.35);
+}
+.multiline-ellipsis {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.multiline-ellipsis2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* number of lines to show */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
