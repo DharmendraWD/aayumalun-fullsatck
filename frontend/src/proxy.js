@@ -5,6 +5,15 @@ import { NextResponse } from "next/server";
 // --- Protected Routes ---
 const PROTECTED_ROUTES = [
   "/admin/dashboard",
+  "/admin/hero",
+  "/admin/about",
+  "/admin/mission",
+  "/admin/team",
+  "/admin/gallery",
+  "/admin/blogs",
+  "/admin/messages",
+  "/admin/faqs",
+  "/admin/others",
 ];
 
 function isProtectedRoute(pathname) {

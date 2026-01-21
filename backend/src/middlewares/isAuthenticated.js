@@ -5,21 +5,26 @@ const jwt = require("jsonwebtoken");
   let token;
 
   // Expect token as: Authorization: Bearer TOKEN
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer")
-  ) {
-    token = req.headers.authorization.split(" ")[1] || req?.cookies?.token;
+  // 1 Check Authorization header first
+  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
   }
 
+  // 2 If no header, check cookie
+  if (!token && req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+  }
 
+  // 3 If still no token, return 401
   if (!token) {
     return res.status(401).json({
       success: false,
-      message: "Not authorized, token missing",
+      message: "Not authorized, token missings",
     });
   }
 
+
+  // console.log(token, "token from isauthenticated ")
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // { email: "john@gmail.com" }, setted from login api from user controller

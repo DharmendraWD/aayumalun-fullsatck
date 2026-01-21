@@ -62,8 +62,14 @@ const fs = require("fs");
 // };
 
 const createHeroSection = async (req, res) => {
-  const { slogan, description, btn1Text, btn1Link, btn2Text, btn2Link } = req.body;
-  const newImages = req.files?.map(file => file.filename) || [];
+  const {
+    slogan,
+    description,
+    btn1Text,
+    btn1Link,
+    btn2Text,
+    btn2Link
+  } = req.body;
 
   try {
     const [existingHeroSection] = await pool.query(
@@ -72,15 +78,14 @@ const createHeroSection = async (req, res) => {
 
     const isUpdate = existingHeroSection.length > 0;
 
-    //  Validation (images required only on CREATE)
+    // Validation
     if (
       !slogan ||
       !description ||
       !btn1Text ||
       !btn1Link ||
       !btn2Text ||
-      !btn2Link ||
-      (!isUpdate && newImages.length === 0)
+      !btn2Link
     ) {
       return res.status(400).json({
         success: false,
@@ -88,21 +93,9 @@ const createHeroSection = async (req, res) => {
       });
     }
 
-    //  Existing images
-    const existingImages =
-      isUpdate && existingHeroSection[0].images
-        ? JSON.parse(existingHeroSection[0].images)
-        : [];
-
-    //  Final images
-    const finalImages =
-      newImages.length > 0 ? newImages : existingImages;
-
-    const finalImagesJson = JSON.stringify(finalImages);
-
-    //  UPDATE
+    // UPDATE
     if (isUpdate) {
-      let updateQuery = `
+      const updateQuery = `
         UPDATE herosection SET
           slogan = ?,
           description = ?,
@@ -110,9 +103,10 @@ const createHeroSection = async (req, res) => {
           btn1Link = ?,
           btn2Text = ?,
           btn2Link = ?
+        WHERE id = 1
       `;
 
-      let values = [
+      const values = [
         slogan,
         description,
         btn1Text,
@@ -121,29 +115,15 @@ const createHeroSection = async (req, res) => {
         btn2Link,
       ];
 
-      //  Update images ONLY if new images uploaded
-      if (newImages.length > 0) {
-        updateQuery += `, images = ?`;
-        values.push(finalImagesJson);
-      }
-
-      updateQuery += ` WHERE id = 1`;
-
       await pool.query(updateQuery, values);
-
-      //  Delete old images ONLY if replaced
-      if (newImages.length > 0) {
-        existingImages.forEach(image => {
-          const imagePath = path.join("uploads", "herosection", image);
-          if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
-        });
-      }
     }
 
-    //  CREATE
+    // CREATE
     else {
       await pool.query(
-        "INSERT INTO herosection (slogan, description, btn1Text, btn1Link, btn2Text, btn2Link, images) VALUES (?,?,?,?,?,?,?)",
+        `INSERT INTO herosection 
+        (slogan, description, btn1Text, btn1Link, btn2Text, btn2Link) 
+        VALUES (?,?,?,?,?,?)`,
         [
           slogan,
           description,
@@ -151,7 +131,6 @@ const createHeroSection = async (req, res) => {
           btn1Link,
           btn2Text,
           btn2Link,
-          finalImagesJson,
         ]
       );
     }
@@ -169,13 +148,82 @@ const createHeroSection = async (req, res) => {
   } catch (error) {
     console.error("Server Error:", error);
 
-    //  Cleanup newly uploaded images on error
-    if (newImages.length > 0) {
-      newImages.forEach(image => {
-        const imagePath = path.join("uploads", "herosection", image);
-        if (fs.existsSync(imagePath)) fs.unlinkSync(imagePath);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+const createHeroImage = async (req, res) => {
+  const { title } = req.body;
+  const images = req.files || [];
+  // console.log(req.file)
+  // console.log("image" , images, "title", title);
+
+  try {
+    // Validation
+    if (!title || images.length === 0) {
+      // cleanup uploaded images
+      images.forEach(file => {
+        const imgPath = path.join("uploads", "herosectionimg", file.filename);
+        if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+      });
+
+      return res.status(400).json({
+        success: false,
+        message: "Title and at least one image are required",
       });
     }
+
+    // Count existing images
+    const [existing] = await pool.query(
+      "SELECT COUNT(*) AS total FROM gallery"
+    );
+
+    const existingCount = existing[0].total;
+    const newCount = images.length;
+
+    // Max 6 images allowed
+    if (existingCount + newCount > 6) {
+      images.forEach(file => {
+        const imgPath = path.join("uploads", "herosectionimg", file.filename);
+        if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+      });
+
+      return res.status(400).json({
+        success: false,
+        message: `Gallery limit exceeded. Maximum 6 images allowed.`,
+      });
+    }
+
+    // Insert images
+    const values = images.map(file => [
+      title,
+      `uploads/herosectionimg/${file.filename}`,
+    ]);
+
+    await pool.query(
+      "INSERT INTO heroimage (title, image) VALUES ?",
+      [values]
+    );
+
+    const [heroimage] = await pool.query("SELECT * FROM heroimage");
+
+    return res.status(201).json({
+      success: true,
+      message: "heroimage images uploaded successfully",
+      data: heroimage,
+    });
+
+  } catch (error) {
+    console.error("heroimage Error:", error);
+
+    // Cleanup uploaded images on error
+    images.forEach(file => {
+      const imgPath = path.join("uploads", "herosectionimg", file.filename);
+      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+    });
 
     return res.status(500).json({
       success: false,
@@ -183,14 +231,51 @@ const createHeroSection = async (req, res) => {
     });
   }
 };
-// FRONTEND  MUST HAVE THIS 
-// if (selectedImages.length > 0) {
-//   selectedImages.forEach(img =>
-//     formData.append("images", img)
-//   );
-// }
+const getallHeroImage = async (req, res) => {
+  try {
+    const [rows] = await pool.query("SELECT * FROM heroimage");
+    res.json(rows);
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+}
+const deleteHeroImage = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [result] = await pool.query("SELECT image FROM heroimage WHERE id = ?", [id]);
+    if (result.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Image not found",
+      });
+    }
 
+    const imgPath = path.join(result[0].image);
+    // console.log(imgPath)
+    if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
 
+    await pool.query("DELETE FROM heroimage WHERE id = ?", [id]);
+
+    const [heroimage] = await pool.query("SELECT * FROM heroimage");
+
+    return res.json({
+      success: true,
+      data: heroimage,
+      message: "Image deleted successfully",
+    });
+    
+  } catch (error) {
+    console.error("Server Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+}
 // get all hero section data 
 const getHeroSection = async (req, res) => {
     try {
@@ -208,68 +293,6 @@ const getHeroSection = async (req, res) => {
         });
     }
 }
-
-// delete hero section image 
-const deleteHeroSectionImage = async (req, res) => {
-  try {
-    const { imageName } = req.params;
-
-    // 1 Get current images from DB
-    const [rows] = await pool.query(
-      "SELECT images FROM herosection WHERE id = 1"
-    );
-
-    if (!rows.length || !rows[0].images) {
-      return res.status(404).json({
-        success: false,
-        message: "Aww, Your Requested Data Not Found.",
-      });
-    }
-
-    let images = rows[0].images;
-
-    // If stored as JSON string
-    if (typeof images === "string") {
-      images = JSON.parse(images);
-    }
-
-    // 2 Check if image exists in DB
-    if (!images.includes(imageName)) {
-      return res.status(404).json({
-        success: false,
-        message: "Aww, Your Requested Data Not Found.",
-      });
-    }
-
-    // 3 Remove image from array
-    const updatedImages = images.filter(img => img !== imageName);
-
-    // 4 Update DB
-    await pool.query(
-      "UPDATE herosection SET images = ? WHERE id = 1",
-      [JSON.stringify(updatedImages)]
-    );
-
-    // 5 Delete file from filesystem
-    const imagePath = path.join("uploads", "herosection", imageName);
-    if (fs.existsSync(imagePath)) {
-      fs.unlinkSync(imagePath);
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "Image deleted successfully",
-      data: updatedImages,
-    });
-
-  } catch (error) {
-    console.error("Server Error:", error);
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Server error",
-    });
-  }
-};
 
 // ABOUT US SECTION
 // create about us section 
@@ -445,87 +468,152 @@ const getAboutUs = async (req, res) => {
 // create image section for about us section
 const createAboutUsImage = async (req, res) => {
   try {
-    //  Check both images exist
-    // console.log(req.files, "firstCardImage")
-    // console.log(req.files.fullImage, "fullImage")
-    if (
-      !req.files ||
-      !req.files.firstCardImage ||
-      !req.files.fullImage
-    ) {
+    const uploadedFiles = {};
+    let filesToCleanup = [];
+
+    // Check which file(s) were uploaded
+    if (req.files?.firstCardImage?.[0]) {
+      uploadedFiles.firstCardImage = req.files.firstCardImage[0].filename;
+      filesToCleanup.push({ field: 'firstCardImage', filename: uploadedFiles.firstCardImage });
+    }
+
+    if (req.files?.fullImage?.[0]) {
+      uploadedFiles.fullImage = req.files.fullImage[0].filename;
+      filesToCleanup.push({ field: 'fullImage', filename: uploadedFiles.fullImage });
+    }
+
+    // Check if at least one file was uploaded
+    if (Object.keys(uploadedFiles).length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Both images (firstCardImage and fullImage) are required",
+        message: "At least one image (firstCardImage or fullImage) is required",
       });
     }
 
-    const firstCardImageFile = req.files.firstCardImage[0];
-    const fullImageFile = req.files.fullImage[0];
+    // Fetch existing record
+    const [existing] = await pool.query("SELECT * FROM aboutusimage WHERE id = 1");
 
-    const firstCardImage = firstCardImageFile.filename;
-    const fullImage = fullImageFile.filename;
-
-    //  Check if record exists
-    const [existing] = await pool.query(
-      "SELECT * FROM aboutusimage WHERE id = 1"
-    );
-
-    let query;
-    let params;
-
+    // Delete old files that are being replaced
     if (existing.length > 0) {
-      //  If exists, delete old files before updating
-      const oldFirst = existing[0].firstCardImage;
-      const oldFull = existing[0].fullImage;
+      if (uploadedFiles.firstCardImage && existing[0].firstCardImage) {
+        const oldPath = path.join("uploads/aboutusimg", existing[0].firstCardImage);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
 
-      const firstPath = path.join("uploads/aboutusimg", oldFirst);
-      const fullPath = path.join("uploads/aboutusimg", oldFull);
+      if (uploadedFiles.fullImage && existing[0].fullImage) {
+        const oldPath = path.join("uploads/aboutusimg", existing[0].fullImage);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
 
-      if (fs.existsSync(firstPath)) fs.unlinkSync(firstPath);
-      if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+      // Update only the fields that were uploaded
+      const updateFields = [];
+      const updateValues = [];
 
-      //  Update record
-      query = `UPDATE aboutusimage 
-               SET firstCardImage = ?, fullImage = ? 
-               WHERE id = 1`;
-      params = [firstCardImage, fullImage];
+      if (uploadedFiles.firstCardImage) {
+        updateFields.push("firstCardImage = ?");
+        updateValues.push(uploadedFiles.firstCardImage);
+      }
 
+      if (uploadedFiles.fullImage) {
+        updateFields.push("fullImage = ?");
+        updateValues.push(uploadedFiles.fullImage);
+      }
+
+      updateValues.push(1); // WHERE id = 1
+
+      await pool.query(
+        `UPDATE aboutusimage SET ${updateFields.join(", ")} WHERE id = ?`,
+        updateValues
+      );
     } else {
-      //  Insert new record
-      query = `INSERT INTO aboutusimage 
-               (id, firstCardImage, fullImage) 
-               VALUES (1, ?, ?)`;
-      params = [firstCardImage, fullImage];
+      // Insert new record with only uploaded fields
+      await pool.query(
+        "INSERT INTO aboutusimage (id, firstCardImage, fullImage) VALUES (1, ?, ?)",
+        [
+          uploadedFiles.firstCardImage || null,
+          uploadedFiles.fullImage || null
+        ]
+      );
     }
 
-    await pool.query(query, params);
+    // Fetch updated record
+    const [data] = await pool.query("SELECT * FROM aboutusimage WHERE id = 1");
 
-    //  Fetch updated record
-    const [data] = await pool.query(
-      "SELECT * FROM aboutusimage WHERE id = 1"
+    return res.status(200).json({
+      success: true,
+      message: "About Us image(s) saved successfully",
+      data: data[0],
+    });
+  } catch (error) {
+    console.error("Server Error:", error);
+
+    // Cleanup newly uploaded files on error
+    if (req.files?.firstCardImage?.[0]) {
+      const firstPath = path.join("uploads/aboutusimg", req.files.firstCardImage[0].filename);
+      if (fs.existsSync(firstPath)) fs.unlinkSync(firstPath);
+    }
+    if (req.files?.fullImage?.[0]) {
+      const fullPath = path.join("uploads/aboutusimg", req.files.fullImage[0].filename);
+      if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+// Controller
+const deleteAboutUsImage = async (req, res) => {
+  try {
+    const { imageType } = req.params; // Get from URL parameter
+
+    // Validate imageType
+    if (!['firstCardImage', 'fullImage'].includes(imageType)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid imageType. Must be 'firstCardImage' or 'fullImage'",
+      });
+    }
+
+    // Fetch existing record
+    const [existing] = await pool.query("SELECT * FROM aboutusimage WHERE id = 1");
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "About Us image record not found",
+      });
+    }
+
+    const imageToDelete = existing[0][imageType];
+
+    if (!imageToDelete) {
+      return res.status(404).json({
+        success: false,
+        message: `${imageType} not found or already deleted`,
+      });
+    }
+
+    // Delete the file
+    const imagePath = path.join("uploads/aboutusimg", imageToDelete);
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+
+    // Set column to NULL
+    await pool.query(
+      `UPDATE aboutusimage SET ${imageType} = NULL WHERE id = 1`
     );
 
     return res.status(200).json({
       success: true,
-      message: "About Us images saved successfully",
-      data: data[0],
+      message: `${imageType} deleted successfully`,
     });
 
   } catch (error) {
     console.error("Server Error:", error);
-
-    //  Cleanup uploaded files if DB fails
-    if (req.files?.firstCardImage) {
-      fs.unlinkSync(
-        path.join("uploads/aboutusimg", req.files.firstCardImage[0].filename)
-      );
-    }
-    if (req.files?.fullImage) {
-      fs.unlinkSync(
-        path.join("uploads/aboutusimg", req.files.fullImage[0].filename)
-      );
-    }
-
     return res.status(500).json({
       success: false,
       message: error.message || "Server error",
@@ -553,7 +641,9 @@ const getAboutUsImage = async (req, res) => {
 // ABOUT US SECTION END 
 
 // MISSION SECTION 
-// create misssion section
+/* ============================
+   CREATE/UPDATE MISSION TEXT
+============================ */
 const createMission = async (req, res) => {
   const {
     heading,
@@ -655,14 +745,17 @@ const createMission = async (req, res) => {
     });
   }
 };
-// get mission 
+
+/* ============================
+   GET MISSION TEXT
+============================ */
 const getMission = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM mission WHERE id = 1");
+    const [mission] = await pool.query("SELECT * FROM mission WHERE id = 1");
+    
     return res.status(200).json({
       success: true,
-      message: "Mission section fetched successfully",
-      data: rows,
+      data: mission[0] || null,
     });
   } catch (error) {
     console.error("Server Error:", error);
@@ -671,89 +764,98 @@ const getMission = async (req, res) => {
       message: error.message || "Server error",
     });
   }
-}
-// create image for mission section
+};
+
+/* ============================
+   CREATE/UPDATE MISSION IMAGES
+   (Upload single or both images)
+============================ */
 const createMissionImage = async (req, res) => {
   try {
-    //  Check both images exist
-    // console.log(req.files.img1[0], "img1")
-    // console.log(req.files.img2, "img2")
-    if (
-      !req.files ||
-      !req.files.img1 ||
-      !req.files.img2
-    ) {
+    const uploadedFiles = {};
+
+    // Check which file(s) were uploaded
+    if (req.files?.img1?.[0]) {
+      uploadedFiles.img1 = req.files.img1[0].filename;
+    }
+
+    if (req.files?.img2?.[0]) {
+      uploadedFiles.img2 = req.files.img2[0].filename;
+    }
+
+    // Check if at least one file was uploaded
+    if (Object.keys(uploadedFiles).length === 0) {
       return res.status(400).json({
         success: false,
-        message: "Both images (img1 and img2) are required",
+        message: "At least one image (img1 or img2) is required",
       });
     }
 
-    const img1File = req.files.img1[0];
-    const img2File = req.files.img2[0];
+    // Fetch existing record
+    const [existing] = await pool.query("SELECT * FROM missionimage WHERE id = 1");
 
-    const img1 = img1File.filename;
-    const img2 = img2File.filename;
-
-    //  Check if record exists
-    const [existing] = await pool.query(
-      "SELECT * FROM missionimage WHERE id = 1"
-    );
-
-    let query;
-    let params;
-
+    // Delete old files that are being replaced
     if (existing.length > 0) {
-      //  If exists, delete old files before updating
-      const oldFirst = existing[0].img1;
-      const oldFull = existing[0].img2;
+      if (uploadedFiles.img1 && existing[0].img1) {
+        const oldPath = path.join("uploads/missionimg", existing[0].img1);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
 
-      const firstPath = path.join("uploads/missionimg", oldFirst);
-      const fullPath = path.join("uploads/missionimg", oldFull);
+      if (uploadedFiles.img2 && existing[0].img2) {
+        const oldPath = path.join("uploads/missionimg", existing[0].img2);
+        if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+      }
 
-      if (fs.existsSync(firstPath)) fs.unlinkSync(firstPath);
-      if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
+      // Update only the fields that were uploaded
+      const updateFields = [];
+      const updateValues = [];
 
-      //  Update record
-      query = `UPDATE missionimage 
-               SET img1 = ?, img2 = ? 
-               WHERE id = 1`;
-      params = [img1, img2];
+      if (uploadedFiles.img1) {
+        updateFields.push("img1 = ?");
+        updateValues.push(uploadedFiles.img1);
+      }
 
+      if (uploadedFiles.img2) {
+        updateFields.push("img2 = ?");
+        updateValues.push(uploadedFiles.img2);
+      }
+
+      updateValues.push(1); // WHERE id = 1
+
+      await pool.query(
+        `UPDATE missionimage SET ${updateFields.join(", ")} WHERE id = ?`,
+        updateValues
+      );
     } else {
-      //  Insert new record
-      query = `INSERT INTO missionimage 
-               (id, img1, img2) 
-               VALUES (1, ?, ?)`;
-      params = [img1, img2];
+      // Insert new record
+      await pool.query(
+        "INSERT INTO missionimage (id, img1, img2) VALUES (1, ?, ?)",
+        [
+          uploadedFiles.img1 || null,
+          uploadedFiles.img2 || null
+        ]
+      );
     }
 
-    await pool.query(query, params);
-
-    //  Fetch updated record
-    const [data] = await pool.query(
-      "SELECT * FROM missionimage WHERE id = 1"
-    );
+    // Fetch updated record
+    const [data] = await pool.query("SELECT * FROM missionimage WHERE id = 1");
 
     return res.status(200).json({
       success: true,
-      message: "Mission  images saved successfully",
+      message: "Mission image(s) saved successfully",
       data: data[0],
     });
-
   } catch (error) {
     console.error("Server Error:", error);
 
-    //  Cleanup uploaded files if DB fails
-    if (req.files?.img1) {
-      fs.unlinkSync(
-        path.join("uploads/missionimg", req.files.img1[0].filename)
-      );
+    // Cleanup newly uploaded files on error
+    if (req.files?.img1?.[0]) {
+      const img1Path = path.join("uploads/missionimg", req.files.img1[0].filename);
+      if (fs.existsSync(img1Path)) fs.unlinkSync(img1Path);
     }
-    if (req.files?.img2) {
-      fs.unlinkSync(
-        path.join("uploads/missionimg", req.files.img2[0].filename)
-      );
+    if (req.files?.img2?.[0]) {
+      const img2Path = path.join("uploads/missionimg", req.files.img2[0].filename);
+      if (fs.existsSync(img2Path)) fs.unlinkSync(img2Path);
     }
 
     return res.status(500).json({
@@ -762,14 +864,24 @@ const createMissionImage = async (req, res) => {
     });
   }
 };
-// get mission image 
-const getMissionImage = async (req, res) => {
+
+/* ============================
+   GET MISSION IMAGES
+============================ */
+const getMissionImages = async (req, res) => {
   try {
-    const [rows] = await pool.query("SELECT * FROM missionimage WHERE id = 1");
+    const [data] = await pool.query("SELECT * FROM missionimage WHERE id = 1");
+
+    if (data.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No images found",
+      });
+    }
+
     return res.status(200).json({
       success: true,
-      message: "Mission images fetched successfully",
-      data: rows,
+      data: data[0],
     });
   } catch (error) {
     console.error("Server Error:", error);
@@ -778,7 +890,68 @@ const getMissionImage = async (req, res) => {
       message: error.message || "Server error",
     });
   }
-}
+};
+
+/* ============================
+   DELETE MISSION IMAGE
+   (Delete specific image by type)
+============================ */
+const deleteMissionImage = async (req, res) => {
+  try {
+    const { imageType } = req.params;
+
+    // Validate imageType
+    if (!['img1', 'img2'].includes(imageType)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid imageType. Must be 'img1' or 'img2'",
+      });
+    }
+
+    // Fetch existing record
+    const [existing] = await pool.query("SELECT * FROM missionimage WHERE id = 1");
+
+    if (existing.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Mission image record not found",
+      });
+    }
+
+    const imageToDelete = existing[0][imageType];
+
+    if (!imageToDelete) {
+      return res.status(404).json({
+        success: false,
+        message: `${imageType} not found or already deleted`,
+      });
+    }
+
+    // Delete the file
+    const imagePath = path.join("uploads/missionimg", imageToDelete);
+    if (fs.existsSync(imagePath)) {
+      fs.unlinkSync(imagePath);
+    }
+
+    // Set column to NULL
+    await pool.query(
+      `UPDATE missionimage SET ${imageType} = NULL WHERE id = 1`
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: `${imageType} deleted successfully`,
+    });
+
+  } catch (error) {
+    console.error("Server Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
 // MISSION SECTION END
 
 // TEAM SECTION 
@@ -1121,6 +1294,27 @@ const deleteBlog = async (req, res) => {
     });
   }
 };
+
+// get particual blog by id 
+const getBlogById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query("SELECT * FROM blogs WHERE id = ?", [id]);
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Blog not found",
+      });
+    }
+    res.json(rows[0]);
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+}
 // update blog 
 const editBlog = async (req, res) => {
   try {
@@ -1421,11 +1615,176 @@ const deleteFaq = async (req, res) => {
     });
   }
 };
-// FAQS SECRION ENEDE
+// FAQS SECRION ENED
+
+// OTHER SECTION 
+const other = async (req, res) => {
+  try {
+    const {
+      a,
+      b,
+      c,
+      d,
+      developedby,
+      copyright,
+      location,
+      mobNo2,
+      mobNo,
+      insta,
+      address,
+      yt,
+      twitter,
+      fb,
+    } = req.body;
+
+    // Basic validation (adjust if some fields are optional)
+    if (
+      !a ||
+      !b ||
+      !c ||
+      !d ||
+      !developedby ||
+      !copyright ||
+      !location ||
+      !mobNo ||
+      !address
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Required fields are missing",
+      });
+    }
+
+    // Check if row exists
+    const [existing] = await pool.query(
+      "SELECT id FROM other WHERE id = 1"
+    );
+
+    // CREATE
+    if (existing.length === 0) {
+      await pool.query(
+        `INSERT INTO other
+        (a, b, c, d, developedby, copyright, location,
+         mobNo2, mobNo, insta, address, yt, twitter, fb)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+        [
+          a,
+          b,
+          c,
+          d,
+          developedby,
+          copyright,
+          location,
+          mobNo2 || null,
+          mobNo,
+          insta || null,
+          address,
+          yt || null,
+          twitter || null,
+          fb || null,
+        ]
+      );
+    }
+    // UPDATE
+    else {
+      await pool.query(
+        `UPDATE other SET
+          a = ?,
+          b = ?,
+          c = ?,
+          d = ?,
+          developedby = ?,
+          copyright = ?,
+          location = ?,
+          mobNo2 = ?,
+          mobNo = ?,
+          insta = ?,
+          address = ?,
+          yt = ?,
+          twitter = ?,
+          fb = ?
+        WHERE id = 1`,
+        [
+          a,
+          b,
+          c,
+          d,
+          developedby,
+          copyright,
+          location,
+          mobNo2 || null,
+          mobNo,
+          insta || null,
+          address,
+          yt || null,
+          twitter || null,
+          fb || null,
+        ]
+      );
+    }
+
+    // Fetch updated data
+    const [other] = await pool.query(
+      "SELECT * FROM other WHERE id = 1"
+    );
+
+    const updatedData = {
+      id: other[0].id,
+      a: other[0].a,
+      b: other[0].b,
+      c: other[0].c,
+      d: other[0].d,
+      developedby: other[0].developedby,
+      copyright: other[0].copyright,
+      location: other[0].location,
+      mobNo2: other[0].mobNo2,
+      mobNo: other[0].mobNo,
+      insta: other[0].insta,
+      address: other[0].address,
+      yt: other[0].yt,
+      twitter: other[0].twitter,
+      fb: other[0].fb,
+    };
+
+    return res.json({
+      success: true,
+      message: "Applied successfully",
+      data: updatedData,
+    });
+
+  } catch (error) {
+    console.error("Other Controller Error:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+const getAllOther = async (req, res) => {
+ try {
+    const [other] = await pool.query(
+      "SELECT * FROM other"
+    );
+
+    res.json({
+      success: true,
+      data: other,
+    });
+  } catch (error) {
+    console.error("Get other Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+}
+// OTHER SECTION END  
 
 
 
-module.exports = { createHeroSection, getHeroSection, deleteHeroSectionImage, createAboutUs, createAboutUsImage, createMissionImage, createMission, getAboutUs, getAboutUsImage, getMission, getMissionImage, createTeam, getAllTeam, deleteTeam, createGallery, deleteGalleryImage, getGallery,createBlog, getallBlog, deleteBlog, editBlog, getAllClientMessage, deleteClientMessage, createClientMessage,   createFaq,
+
+module.exports = { createHeroSection, getHeroSection, createAboutUs, createAboutUsImage, createMissionImage, createMission, getAboutUs, getAboutUsImage, getMission, createTeam, getAllTeam, deleteTeam, createGallery, deleteGalleryImage, getGallery,createBlog, getallBlog, deleteBlog, editBlog, getAllClientMessage, deleteClientMessage, createClientMessage,   createFaq,
   getAllFaqs,
   updateFaq,
-  deleteFaq, };
+  deleteFaq,other, getAllOther, createHeroImage, getallHeroImage, deleteHeroImage, deleteAboutUsImage, getMissionImages, deleteMissionImage, getBlogById };

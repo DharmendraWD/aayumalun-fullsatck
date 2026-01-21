@@ -13,18 +13,10 @@ const contentRoutes = require("./routes/content.routes");
 // calling database 
 dbConnection();
 
-// middlewares
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
-
-// Serve static uploaded files
-app.use('/uploads', express.static('uploads'));
-
-// ----------------------------------------------------
+// cors 
 app.set("trust proxy", 1);
 const allowedOrigins = [
-  "https://aayumalun.up.railway.app",
+  "https://aayumalunhydro.com.np",
   "http://localhost:3000"
 ];
 
@@ -42,6 +34,17 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
+app.use(cookieParser());
+// middlewares
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Serve static uploaded files
+app.use('/uploads', express.static('uploads'));
+
+// ----------------------------------------------------
+
 
 app.get("/", (req, res) => {
   res.send("API running 🐢");

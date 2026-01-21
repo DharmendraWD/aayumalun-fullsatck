@@ -1,5 +1,5 @@
 const express = require("express");
-const {createHeroSection, getHeroSection, deleteHeroSectionImage, createAboutUs, createAboutUsImage, createMissionImage, createMission, getAboutUs, getAboutUsImage, getMission, getMissionImage, createTeam, getAllTeam, deleteTeam, createGallery, deleteGalleryImage, getGallery, createBlog, getallBlog, deleteBlog, editBlog, getAllClientMessage, deleteClientMessage, createClientMessage, createFaq, getAllFaqs, updateFaq, deleteFaq} = require("../controllers/contents.controller");
+const {createHeroSection, getHeroSection, deleteHeroSectionImage, createAboutUs, createAboutUsImage, createMissionImage, createMission, getAboutUs, getAboutUsImage, getMission, getMissionImage, createTeam, getAllTeam, deleteTeam, createGallery, deleteGalleryImage, getGallery, createBlog, getallBlog, deleteBlog, editBlog, getAllClientMessage, deleteClientMessage, createClientMessage, createFaq, getAllFaqs, updateFaq, deleteFaq, other, getAllOther, createHeroImage, getallHeroImage, deleteHeroImage, deleteAboutUsImage, getMissionImages, deleteMissionImage, getBlogById} = require("../controllers/contents.controller");
 const upload = require("../middlewares/imageUpload");
 const {isAuthenticated} = require("../middlewares/isAuthenticated");
 
@@ -9,34 +9,47 @@ const {isAuthenticated} = require("../middlewares/isAuthenticated");
 const router = express.Router();
 
     // HERO SECTION 
-    router.put("/herosection",
-        upload.array("images"),
-        createHeroSection);
+  router.put(
+  "/herosection",
+  isAuthenticated,
+  upload.none(), 
+  createHeroSection
+);
+
 router.get("/herosection", getHeroSection);
-router.delete("/herosection/:imageName", deleteHeroSectionImage);
+// router.delete("/herosection/:imageName", isAuthenticated, deleteHeroSectionImage);
+router.post("/herosectionimg", upload.array("images"), isAuthenticated, createHeroImage);
+router.get("/herosectionimg", getallHeroImage);
+router.delete("/herosectionimg/:id", isAuthenticated, deleteHeroImage);
  // HERO SECTION END
 
 
 //  ABOUT US SECTION 
-router.put("/aboutus", createAboutUs);
+router.put("/aboutus", isAuthenticated,  upload.none(), createAboutUs);
 router.get("/aboutus", getAboutUs);
-router.put("/aboutusimg",
+router.post("/aboutusimg",
      upload.fields([
     { name: "firstCardImage", maxCount: 1 },
     { name: "fullImage", maxCount: 1 }
-  ]), createAboutUsImage);
+  ]), isAuthenticated, createAboutUsImage);
   router.get("/aboutusimg", getAboutUsImage);
+router.delete("/aboutusimg/:imageType", isAuthenticated, deleteAboutUsImage);
 //  ABOUT US SECTION END
 
 // MISSION SECTION
-router.put("/mission", createMission);
+router.put("/mission", upload.none(), isAuthenticated, createMission);
 router.get("/mission", getMission); 
 router.put("/missionimg", 
-       upload.fields([
+  upload.fields([
     { name: "img1", maxCount: 1 },
     { name: "img2", maxCount: 1 }
-  ]), createMissionImage);
-  router.get("/missionimg", getMissionImage);
+  ]), 
+  isAuthenticated, 
+  createMissionImage
+);
+
+router.get("/missionimg", getMissionImages);
+router.delete("/missionimg/:imageType", isAuthenticated, deleteMissionImage);
 // MISSION SECTION END
 
 // TEAM SECTION 
@@ -61,6 +74,7 @@ router.put(
   upload.single("coverImage"),
   editBlog
 );
+router.get("/blogs/:id", getBlogById);
 // BLOG SECTION END
 
 // CLIENT MESSAGE SECTION 
@@ -75,6 +89,11 @@ router.get("/faqs", getAllFaqs);
 router.put("/faqs/:id", isAuthenticated, updateFaq);
 router.delete("/faqs/:id", isAuthenticated, deleteFaq);
 // FAQS SECTION END
+
+// OTHER SECTION 
+router.get("/other", getAllOther);
+router.put("/other", isAuthenticated, other);
+// OTHER SECTION END
 
 
 module.exports = router;

@@ -228,4 +228,18 @@ const getLoggedInUserDetails = async (req, res) => {
     });
 }
 
-module.exports = { createUser, getAllUsers, login, getLoggedInUserDetails,deleteUser };
+// log out user api 
+const logOutUser = async (req, res) => {
+  try {
+    res.clearCookie("token");
+    return res.status(200).json({ success: true, message: "Logout successful" });
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+module.exports = { createUser, getAllUsers, login, getLoggedInUserDetails,deleteUser, logOutUser };

@@ -1,36 +1,56 @@
-// components/MissionVisionValues.js
+// components/MissionVisionValues.js - SERVER COMPONENT
 
 import React from "react";
 import { Target, Eye, Gem } from "lucide-react";
-// import img from "../../../../public/img/imghydroportrait.jpeg";
-import img from "../../../../public/img/proj/mission.jpeg";
 
-// Static MVV Data (no API)
-const mvvData = [
-  {
-    title: "Our Mission",
-    description:
-      "To generate clean, reliable, and sustainable energy by harnessing the natural power of water—empowering communities, protecting the environment, and driving a greener future.",
-    icon: Target,
-  },
-  {
-    title: "Our Vision",
-    description:
-      "To be a global leader in hydropower, setting the standard for sustainable energy development while creating a positive impact on people, ecosystems, and the planet.",
-    icon: Eye,
-  },
-  {
-    title: "Our Values",
-    description:
-      "Our work is guided by ethical principles and a dedication to transparency, ensuring that every project we undertake meets the highest standards of safety and accountability.",
-    icon: Gem,
-  },
-];
+// Helper function to fetch data on server
+async function getMissionData() {
+  try {
+    const [missionResponse, imagesResponse] = await Promise.all([
+      fetch(`${process.env.BASE_API}/contents/mission`, { 
+        cache: 'force-cache',
+        next: { revalidate: 3600 } // Revalidate every hour
+      }),
+      fetch(`${process.env.BASE_API}/contents/missionimg`, { 
+        cache: 'force-cache',
+        next: { revalidate: 3600 }
+      })
+    ]);
 
-// Reusable Card Component
+    if (!missionResponse.ok) {
+      throw new Error('Failed to fetch mission data');
+    }
+
+    const missionData = await missionResponse.json();
+    const imagesData = imagesResponse.ok ? await imagesResponse.json() : null;
+
+    return {
+      mission: missionData.success ? missionData.data : null,
+      images: imagesData?.success ? imagesData.data : null
+    };
+  } catch (error) {
+    console.error('Error fetching mission data:', error);
+    return { mission: null, images: null, error: error.message };
+  }
+}
+
+// Fallback data in case API fails
+const fallbackMissionData = {
+  heading: "Mission",
+  shortpara: "Deliver reliable renewable energy through sustainable hydropower development for Nepal’s future growth.",
+  firstCardHeading: "Our Mission",
+  firstCardPara: "To generate clean, reliable, and sustainable energy by harnessing the natural power of water—empowering communities, protecting the environment, and driving a greener future.",
+  secCardHeading: "Our Vision",
+  secCardPara: "To be a global leader in hydropower, setting the standard for sustainable energy development while creating a positive impact on people, ecosystems, and the planet.",
+  thirdCardHeading: "Our Values",
+  thirdCardPara: "Our work is guided by ethical principles and a dedication to transparency, ensuring that every project we undertake meets the highest standards of safety and accountability."
+};
+
+// Card Component - Can stay as a regular component since it doesn't use client hooks
 const MvvCard = ({ title, description, Icon }) => {
   return (
-    <div  data-aos="fade-down-right"
+    <div
+      data-aos="fade-down-right"
       className={`p-6 md:p-8 rounded-xl border border-gray-200 bg-white
         transition-all duration-300 ease-in-out cursor-pointer h-full
         flex flex-col justify-start text-left
@@ -56,7 +76,7 @@ const MvvCard = ({ title, description, Icon }) => {
 
       <p
         className="mt-2 text-base text-gray-600 leading-relaxed transition-colors 
-        duration-300 ease-in-out group-hover:text-white font-semibold "
+        duration-300 ease-in-out group-hover:text-white font-semibold"
       >
         {description}
       </p>
@@ -64,8 +84,41 @@ const MvvCard = ({ title, description, Icon }) => {
   );
 };
 
-// Main Mission Section
-const Mission = () => {
+// Main Mission Section - SERVER COMPONENT
+const Mission = async () => {
+  // Fetch data on the server
+  const { mission, images, error } = await getMissionData();
+  
+  // Use API data or fallback
+  const missionData = mission || [];
+  const missionImages = images || [];
+  
+
+  // Prepare card data
+  const cardData = [
+    {
+      title: missionData.firstCardHeading,
+      description: missionData.firstCardPara,
+      icon: Target,
+    },
+    {
+      title: missionData.secCardHeading,
+      description: missionData.secCardPara,
+      icon: Eye,
+    },
+    {
+      title: missionData.thirdCardHeading,
+      description: missionData.thirdCardPara,
+      icon: Gem,
+    },
+  ];
+
+  // If there was an error, you could optionally show an error message
+  // But we'll use fallback data so the component still renders
+  if (error && !mission) {
+    console.warn('Using fallback data due to API error:', error);
+  }
+
   return (
     <section className="bg-white py-16 md:py-24">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,17 +127,16 @@ const Mission = () => {
           {/* LEFT SIDE */}
           <div>
             <h2 className="text-4xl sm:text-5xl font-extrabold text-gray-900 mb-6">
-              Mission
+              {missionData.heading}
             </h2>
 
-            <p className="text-lg text-gray-600 mb-10 font-semibold  leading-relaxed max-w-lg">
-              Deliver reliable renewable energy through sustainable hydropower
-              development for Nepal’s future growth.
+            <p className="text-lg text-gray-600 mb-10 font-semibold leading-relaxed max-w-lg">
+              {missionData.shortpara}
             </p>
 
             {/* CARDS */}
             <div className="flex flex-col gap-6">
-              {mvvData.map((item, idx) => (
+              {cardData.map((item, idx) => (
                 <MvvCard
                   key={idx}
                   title={item.title}
@@ -96,13 +148,25 @@ const Mission = () => {
           </div>
 
           {/* RIGHT SIDE IMAGE */}
-          <div className="h-full min-h-[400px]">
-            <div className="relative w-full  rounded-2xl overflow-hidden shadow-xl">
-              <img data-aos="zoom-out-up"
-                src={img.src}
-                alt="Hydropower"
-                className="w-full max-h-[860px] object-cover"
+          <div className="h-full min-h-[400px] flex">
+            <div className="relative w-full rounded-2xl overflow-hidden  flex flex-col justify-around">
+              <img
+                data-aos="zoom-out-up"
+                src={process.env.BASE_CONTENT_URL+"uploads"+"/missionimg/"+missionImages?.img1}
+                alt="Hydropower Mission"
+                className="w-full max-h-[300px] rounded-xl object-cover"
+                loading="lazy"
+                
               />
+              <img
+                data-aos="zoom-out-up"
+                src={process.env.BASE_CONTENT_URL+"uploads"+"/missionimg/"+missionImages?.img2}
+                alt="Hydropower Mission"
+                className="w-full max-h-[300px] rounded-xl object-cover"
+                loading="lazy"
+                
+              />
+
             </div>
           </div>
 

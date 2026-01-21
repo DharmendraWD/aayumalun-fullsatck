@@ -10,7 +10,7 @@ const allowedSections = [
   "services",
   "projects",
   "gallery",
-  "herosection",
+  "herosectionimg",
   "missionimg",
   "aboutusimg",
   "team",
