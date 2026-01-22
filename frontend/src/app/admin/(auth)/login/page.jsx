@@ -22,7 +22,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({ email: "ecxample@gmail.com", password: "1" });
+  const [formData, setFormData] = useState({ email: "", password: "" });
 
   const handleLogin = async (e) => {
     e.preventDefault();
