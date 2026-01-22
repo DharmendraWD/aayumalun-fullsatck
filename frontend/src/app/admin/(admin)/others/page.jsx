@@ -355,11 +355,11 @@ export default function OtherPage() {
                       value={formData.location || ""}
                       onChange={(e) => handleInputChange('location', e.target.value)}
                       placeholder="Enter location"
-                      className="w-full px-3 py-2 rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
+                      className="w-full px-3 py-2 overflow-scroll my-scroll rounded-lg border border-slate-300 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all text-sm"
                     />
                   ) : (
                     <div className="bg-slate-50 rounded-lg p-3">
-                      <p className="text-slate-700">{formData.location || "Not set"}</p>
+                      <p className="text-slate-700 overflow-scroll my-scroll">{formData.location || "Not set"}</p>
                     </div>
                   )}
                 </div>
@@ -526,7 +526,7 @@ export default function OtherPage() {
                   <div className="space-y-2">
                     <div className="text-sm">
                       <span className="font-semibold text-slate-600">Location:</span>
-                      <p className="text-slate-500">{formData.location || "Not set"}</p>
+                      <p className="text-slate-500 overflow-scroll my-scroll">{formData.location || "Not set"}</p>
                     </div>
                     <div className="text-sm">
                       <span className="font-semibold text-slate-600">Phone:</span>
