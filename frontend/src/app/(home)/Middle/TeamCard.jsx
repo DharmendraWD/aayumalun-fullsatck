@@ -33,7 +33,8 @@ const TeamCarousel = () => {
             name: member.name,
             title: "Team Member", // Default title since API doesn't provide it
             img: `${process.env.NEXT_PUBLIC_BASE_CONTENT_URL}uploads/team/${member.dp}`,
-            desc: member.description
+            desc: member.description,
+            designation: member.designation
           }));
           
           setTeamMembers(transformedData);
@@ -114,6 +115,7 @@ const TeamCarousel = () => {
               <img src={member.img} alt={member?.name} className="team-img mx-auto" />
             </div>
             <h3 className="font-semibold">{member?.name}</h3>
+            <h3 className="font-semibold">{member?.designation}desi</h3>
             {/* <h4 className="font-semibold ">{member?.title}</h4> */}
             <p className="max-h-[100px] overflow-scroll my-scroll text-gray-600 font-semibold ">{member.desc}</p>
           </div>

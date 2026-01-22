@@ -33,6 +33,7 @@ export default function TeamPage() {
   const [newMember, setNewMember] = useState({
     name: "",
     description: "",
+    designation: "",
   });
   const fileInputRef = useRef(null);
 
@@ -69,7 +70,9 @@ export default function TeamPage() {
   };
 
   const handleCreateTeamMember = () => {
-    if (!newMember.name || !newMember.description || !selectedFile) {
+  // console.log(newMember)
+
+    if (!newMember.name || !newMember.description || !selectedFile || !newMember.designation) {
       toast.error("Please fill all fields and select an image");
       return;
     }
@@ -77,13 +80,15 @@ export default function TeamPage() {
     const formData = new FormData();
     formData.append("name", newMember.name);
     formData.append("description", newMember.description);
+    formData.append("designation", newMember.designation);
     formData.append("dp", selectedFile.file);
 
     dispatch(createTeam(formData));
     setIsAddModalOpen(false);
     setSelectedFile(null);
-    setNewMember({ name: "", description: "" });
+    setNewMember({ name: "", description: "", designation: "" });
   };
+
 
   // Handle Delete
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -105,6 +110,7 @@ export default function TeamPage() {
   /* ============================
      RENDER
   ============================ */
+  // console.log(teamData)
 
   return (
     <>
@@ -167,8 +173,11 @@ export default function TeamPage() {
                 {/* Content Section */}
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-slate-800 mb-2 truncate">
-                    {member.name}
+                    {member.name}nb
                   </h3>
+                  <p className="text-sm text-slate-500 line-clamp-2">
+                    {member.designation}
+                  </p>
                   <p className="text-sm text-slate-500 line-clamp-2">
                     {member.description}
                   </p>
@@ -215,7 +224,7 @@ export default function TeamPage() {
           onClose={() => {
             setIsAddModalOpen(false);
             setSelectedFile(null);
-            setNewMember({ name: "", description: "" });
+            setNewMember({ name: "", description: "", designation: "" });
           }}
           title="Add New Team Member"
           primaryAction={handleCreateTeamMember}
@@ -282,6 +291,21 @@ export default function TeamPage() {
                 value={newMember.name}
                 onChange={(e) =>
                   setNewMember({ ...newMember, name: e.target.value })
+                }
+                placeholder="Enter member name"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                <HiOutlineUser className="text-indigo-500" />
+                Designation
+              </label>
+              <input
+                type="text"
+                value={newMember.designation}
+                onChange={(e) =>
+                  setNewMember({ ...newMember, designation: e.target.value })
                 }
                 placeholder="Enter member name"
                 className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"

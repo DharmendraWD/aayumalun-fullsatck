@@ -957,12 +957,12 @@ const deleteMissionImage = async (req, res) => {
 // TEAM SECTION 
 // create team 
 const createTeam = async (req, res) => {
-  const { name, description } = req.body;
+  const { name, description, designation } = req.body;
   const dp = req.file ? req.file.filename : null;
 
   try {
     // Validation
-    if (!name || !description || !dp) {
+    if (!name || !description || !dp || !designation) {
       // Remove uploaded image if validation fails
       if (dp) {
         const imagePath = path.join("uploads", "team", dp);
@@ -971,15 +971,15 @@ const createTeam = async (req, res) => {
 
       return res.status(400).json({
         success: false,
-        message: "Name, description, and display picture are required",
+        message: "Name, description, designation and display picture are required",
       });
     }
 
     // Insert into team table
     const [result] = await pool.query(
-      `INSERT INTO team (name, dp, description)
-       VALUES (?, ?, ?)`,
-      [name, dp, description]
+      `INSERT INTO team (name, dp, description, designation)
+       VALUES (?, ?, ?, ?)`,
+      [name, dp, description, designation]
     );
 
     // Fetch newly created record
@@ -1030,20 +1030,47 @@ const getAllTeam = async (req, res) => {
 const deleteTeam = async (req, res) => {
   try {
     const { id } = req.params;
-    const [result] = await pool.query("DELETE FROM team WHERE id = ?", [id]);
 
-    if (result.affectedRows === 0) {
+    // 1 Get image name first
+    const [rows] = await pool.query(
+      "SELECT dp FROM team WHERE id = ?",
+      [id]
+    );
+
+    if (rows.length === 0) {
       return res.status(404).json({
         success: false,
         message: "Team member not found",
       });
     }
 
+    const imageName = rows[0].dp;
+
+    // 2 Delete database record
+    const [result] = await pool.query(
+      "DELETE FROM team WHERE id = ?",
+      [id]
+    );
+
+    // 3Delete image file
+    if (imageName) {
+      const imagePath = path.join(
+        process.cwd(),
+        "uploads",
+        "team",
+        imageName
+      );
+
+      if (fs.existsSync(imagePath)) {
+        fs.unlinkSync(imagePath);
+      }
+    }
+
     return res.status(200).json({
       success: true,
-      message: "Team member deleted successfully",
-      data: result,
+      message: "Team member and image deleted successfully",
     });
+
   } catch (error) {
     console.error("Server Error:", error);
     return res.status(500).json({
@@ -1051,7 +1078,8 @@ const deleteTeam = async (req, res) => {
       message: error.message || "Server error",
     });
   }
-}
+};
+
 // TEAM SECTION END
 
 // GALLARY SECTION 
@@ -1635,6 +1663,7 @@ const other = async (req, res) => {
       yt,
       twitter,
       fb,
+      email,
     } = req.body;
 
     // Basic validation (adjust if some fields are optional)
@@ -1665,8 +1694,8 @@ const other = async (req, res) => {
       await pool.query(
         `INSERT INTO other
         (a, b, c, d, developedby, copyright, location,
-         mobNo2, mobNo, insta, address, yt, twitter, fb)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+         mobNo2, mobNo, insta, address, yt, twitter, fb, email)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
         [
           a,
           b,
@@ -1682,6 +1711,7 @@ const other = async (req, res) => {
           yt || null,
           twitter || null,
           fb || null,
+          email || null
         ]
       );
     }
@@ -1702,7 +1732,8 @@ const other = async (req, res) => {
           address = ?,
           yt = ?,
           twitter = ?,
-          fb = ?
+          fb = ?,
+          email = ?
         WHERE id = 1`,
         [
           a,
@@ -1719,6 +1750,7 @@ const other = async (req, res) => {
           yt || null,
           twitter || null,
           fb || null,
+          email || null
         ]
       );
     }
@@ -1744,6 +1776,7 @@ const other = async (req, res) => {
       yt: other[0].yt,
       twitter: other[0].twitter,
       fb: other[0].fb,
+      email: other[0].email,
     };
 
     return res.json({
