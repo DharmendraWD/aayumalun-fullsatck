@@ -14,6 +14,8 @@ const PROTECTED_ROUTES = [
   "/admin/messages",
   "/admin/faqs",
   "/admin/others",
+  "/admin/user-management",
+  "/admin/change-password",
 ];
 
 function isProtectedRoute(pathname) {

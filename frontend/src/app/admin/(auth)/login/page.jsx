@@ -175,24 +175,17 @@ export default function LoginPage() {
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-slate-200"></div>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white px-4 text-slate-400 font-bold tracking-widest">Don't have Account</span>
+              <div className="relative cursor-pointer flex justify-center text-xs uppercase"
+                onClick={() => setIsModalOpen(true)}
+              >
+                <span className="bg-white text-indigo-600 font-bold hover:bg-[#c0cbff21] transition duration-300 ease-in-out rounded-full px-[5px] pb-[4px] hover:text-indigo-700 tracking-widest">Ahh I don't have an Account  <span className='text-[28px] abolute top-[13px]'>&#x1F926;</span> </span>
               </div>
             </div>
 
     
           </form>
 
-          {/* Update your "Contact Support" link to open modal */}
-      <p className="mt-8 text-center text-slate-500 text-sm">
-        Don't have an account?{" "}
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="text-indigo-600 font-bold hover:underline"
-        >
-          Contact Support
-        </button>
-      </p>
+
 
       {/* --- REUSABLE MODAL INSTANCE --- */}
       <DialogueModal 
