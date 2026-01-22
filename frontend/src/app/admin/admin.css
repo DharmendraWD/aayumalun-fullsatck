@@ -41,3 +41,14 @@ button{
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.glass-effect {
+  /* The semi-transparent background color */
+  background-color: rgba(192, 228, 255, 0.39); /* This is #c0e4ff63 */
+  
+  /* Required for Safari and older iOS browsers */
+  -webkit-backdrop-filter: blur(7px);
+  
+  /* Standard syntax for Chrome, Firefox, and Edge */
+  backdrop-filter: blur(7px);
+}

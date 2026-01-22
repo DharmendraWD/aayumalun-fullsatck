@@ -46,7 +46,7 @@ const ContactForm = () => {
         if (showSuccessMessage) {
             const timer = setTimeout(() => {
                 setShowSuccessMessage(false);
-            }, 3000);
+            }, 5000);
             
             return () => clearTimeout(timer);
         }
@@ -136,28 +136,28 @@ const ContactForm = () => {
         <section className="py-12 md:py-24" id='contact'>
             {/* Custom Success Message Overlay */}
             {showSuccessMessage && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-                    <div className="bg-white rounded-2xl p-8 max-w-md mx-4 transform transition-all duration-300 scale-100 animate-fade-in">
-                        <div className="flex flex-col items-center text-center">
-                            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
-                                <MdCheckCircle className="w-12 h-12 text-green-600" />
-                            </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                Message Sent Successfully!
-                            </h3>
-                            <p className="text-gray-600 mb-6">
-                                Awww, We Shall Contact You Soon!
-                            </p>
-                            <div className="w-full bg-gray-200 rounded-full h-2">
-                                <div 
-                                    className="bg-green-500 h-2 rounded-full transition-all duration-3000 ease-linear"
-                                    style={{ width: '100%' }}
-                                ></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+                                    <div className="fixed inset-0 z-50 flex items-center justify-center glass-effect">
+                                        <div className="bg-white rounded-2xl p-8 max-w-md mx-4 transform transition-all duration-300 scale-100 animate-fade-in">
+                                            <div className="flex flex-col items-center text-center">
+                                                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                                                    <MdCheckCircle className="w-12 h-12 text-green-600" />
+                                                </div>
+                                                <h3 className="text-2xl font-bold text-[#2cc54c] mb-2">
+                                                    Message Sent Successfully!
+                                                </h3>
+                                                <p className="text-[#2a90ff] mb-6">
+                                                    Awww, We Shall Contact You Soon!
+                                                </p>
+                                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                                    <div 
+                                                        className="bg-green-500 h-2 rounded-full transition-all duration-3000 ease-linear"
+                                                        style={{ width: '100%' }}
+                                                    ></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
             
             <div className="container mx-auto px-4 max-w-[1440px]">
                 <div className="grid grid-cols-1 justify-center lg:grid-cols-2 gap-10 lg:gap-20 items-start" style={{justifyItems:'center'}}>

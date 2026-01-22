@@ -41,6 +41,7 @@ useEffect(() => {
   { name: 'Client Message', href: '/admin/messages', icon: HiOutlineChatAlt2 },
   { name: 'FAQs', href: '/admin/faqs', icon: HiOutlineQuestionMarkCircle },
   { name: 'Social & Others', href: '/admin/others', icon: TiSocialFacebook },
+  { name: 'Change Password', href: '/admin/change-password', icon: RiAdminFill },
 ];
 
 // Add User Management only if user is super admin

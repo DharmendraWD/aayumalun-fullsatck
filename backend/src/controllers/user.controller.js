@@ -128,6 +128,31 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// change logged in user password 
+const changePassword = async (req, res) => {
+  try {
+    const { userId } = req.user;
+    const { oldPassword, newPassword } = req.body;
+    const [rows] = await pool.query("SELECT * FROM users WHERE id = ?", [userId]);
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+    const user = rows[0];
+    if (!bcrypt.compareSync(oldPassword, user.password)) {
+      return res.status(401).json({ success: false, message: "Invalid old password" });
+    }
+    const hashedPassword = bcrypt.hashSync(newPassword, 10);
+    await pool.query("UPDATE users SET password = ? WHERE id = ?", [hashedPassword, userId]);
+    res.json({ success: true, message: "Password changed successfully" });
+  } catch (error) {
+    console.error("Server Error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+}
+
 
 // login user api 
 const login = async (req, res) => {
@@ -242,4 +267,4 @@ const logOutUser = async (req, res) => {
   }
 };
 
-module.exports = { createUser, getAllUsers, login, getLoggedInUserDetails,deleteUser, logOutUser };
+module.exports = { createUser, getAllUsers, login, getLoggedInUserDetails,deleteUser, logOutUser, changePassword };

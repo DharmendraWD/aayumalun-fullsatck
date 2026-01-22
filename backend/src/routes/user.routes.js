@@ -1,5 +1,5 @@
 const express = require("express");
-const { createUser, getAllUsers, getLoggedInUserDetails, login, deleteUser ,logOutUser } = require("../controllers/user.controller");
+const { createUser, getAllUsers, getLoggedInUserDetails, login, deleteUser ,logOutUser, changePassword } = require("../controllers/user.controller");
 const upload = require("../middlewares/imageUpload");
 const {isAuthenticated} = require("../middlewares/isAuthenticated");
 
@@ -16,7 +16,7 @@ router.get("/users", isAuthenticated,  getAllUsers);
 router.delete("/users/:id", isAuthenticated,  deleteUser);
 router.post("/users/login",  login);
 router.post("/users/logout", isAuthenticated, logOutUser);
-// router.delete("/user/:id", deleteUser);
+router.post("/users/changepassword", isAuthenticated, changePassword);
 
 // auth me 
 router.get("/me", isAuthenticated, getLoggedInUserDetails);

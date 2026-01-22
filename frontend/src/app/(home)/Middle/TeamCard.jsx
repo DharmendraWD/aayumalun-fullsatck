@@ -102,7 +102,7 @@ const TeamCarousel = () => {
         responsive={responsive}
         infinite
         autoPlay
-        autoPlaySpeed={20000000}
+        autoPlaySpeed={3000}
         transitionDuration={800}
         containerClass="carousel-container fade-carousel"
         arrows={false}
