@@ -1,7 +1,7 @@
 import React from 'react';
 import Head from 'next/head';
-import RoundedBgBtn from '@/components/Buttons/RoundedBgBtn';
-import RoundedNotBGBtn from '@/components/Buttons/RoundedNotBGBtn';
+import RoundedBgBtn from '../../components/Buttons/RoundedBgBtn';
+import RoundedNotBGBtn from '../../components/Buttons/RoundedNotBGBtn';
 
 // Fetch hero section text data
 async function getHeroData() {
@@ -9,7 +9,6 @@ async function getHeroData() {
     const res = await fetch(
       `${process.env.BASE_API}/contents/herosection`,
       {
-        cache: 'no-store', // Always get fresh data
         next: { revalidate: 60 } // Revalidate every 60 seconds
       }
     );
@@ -32,7 +31,6 @@ async function getHeroImages() {
     const res = await fetch(
       `${process.env.BASE_API}/contents/herosectionimg`,
       {
-        cache: 'no-store',
         next: { revalidate: 60 }
       }
     );

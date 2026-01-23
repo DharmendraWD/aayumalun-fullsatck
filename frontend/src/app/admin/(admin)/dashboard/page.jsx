@@ -2,7 +2,8 @@
 import React, { useEffect } from 'react';
 import { HiOutlineMail, HiOutlinePhone, HiOutlineUser } from 'react-icons/hi';
 import { useDispatch, useSelector } from "react-redux"
-import { userDets } from '@/app/admin/(admin)/redux/slices/loggedInUserDets/loggedInUserDetsSlice';
+import { userDets } from '../redux/slices/loggedInUserDets/loggedInUserDetsSlice';
+// import { userDets } from '@/app/admin/(admin)/redux/slices/loggedInUserDets/loggedInUserDetsSlice';
 
 export default function DashboardPage() {
 

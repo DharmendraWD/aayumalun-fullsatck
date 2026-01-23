@@ -37,7 +37,7 @@ export const createBlog = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/blogs`,
         {
           method: "POST",
-          credentials: "include",
+          // credentials: "include",
           body: formData,
         }
       );
@@ -69,7 +69,7 @@ export const deleteBlog = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/blogs/${blogId}`,
         {
           method: "DELETE",
-          credentials: "include",
+          // credentials: "include",
         }
       );
 
@@ -101,7 +101,7 @@ export const updateBlog = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/blogs/${id}`,
         {
           method: "PUT",
-          credentials: "include",
+          // credentials: "include",
           body: formData,
         }
       );

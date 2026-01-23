@@ -7,7 +7,7 @@ import Sidebar from './components/Sidebar';
 import StoreProvider from './redux/storeProvider/StoreProvider';
 import "../admin.css"
 import React, { useEffect, useState } from 'react';
-import ToastProvider from '@/components/toast/ToastProvider';
+import ToastProvider from '../../../components/toast/ToastProvider';
 
 
 // Create a client component that uses Redux inside StoreProvider

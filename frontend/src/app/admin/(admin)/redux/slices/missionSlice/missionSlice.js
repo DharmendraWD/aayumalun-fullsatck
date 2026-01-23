@@ -37,7 +37,7 @@ export const editMission = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/mission`,
         {
           method: "PUT", //  Changed to PUT to match backend route
-          credentials: "include",
+          // credentials: "include",
           body: formData,
         }
       );
@@ -93,7 +93,7 @@ export const createMissionImage = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/missionimg`,
         {
           method: "PUT", //  Changed to PUT to match backend route
-          credentials: "include",
+          // credentials: "include",
           body: formData,
         }
       );
@@ -126,7 +126,7 @@ export const deleteMissionImage = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/missionimg/${imageType}`,
         {
           method: "DELETE",
-          credentials: "include",
+          // credentials: "include",
         }
       );
 

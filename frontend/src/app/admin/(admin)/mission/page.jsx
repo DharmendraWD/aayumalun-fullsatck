@@ -154,7 +154,7 @@ export default function MissionPage() {
 
             <div className="max-w-6xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
                 {/* HEADER */}
-                <header className="flex justify-between items-center mb-10">
+                <header className="flex justify-between lg:flex-row flex-col  items-center mb-10">
                     <div>
                         <h1 className="text-3xl font-extrabold text-slate-900">Mission</h1>
                         <p className="text-slate-500">Manage Mission content and images</p>

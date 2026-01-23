@@ -15,7 +15,10 @@ import { TiSocialFacebook } from "react-icons/ti";
 import toast from 'react-hot-toast';
 import { RiAdminFill } from "react-icons/ri";
 import { useDispatch, useSelector } from "react-redux"
-import { userDets } from '@/app/admin/(admin)/redux/slices/loggedInUserDets/loggedInUserDetsSlice';
+// import { userDets } from '@/app/admin/(admin)/redux/slices/loggedInUserDets/loggedInUserDetsSlice';
+import { userDets } from '../redux/slices/loggedInUserDets/loggedInUserDetsSlice';
+import { deleteCookie } from 'cookies-next';
+
 
 
 
@@ -61,29 +64,34 @@ if (userdets?.isAdmin === 1) {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const handleLogoutApi = async () => {
+
+const handleLogoutApi = async () => {
     setIsLoggingOut(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/logout`, {
-        method: "POST",
-        credentials: "include", // Backend needs this to clear the cookie
-      });
+      // 1. Clear Cookies with all possible variations that production might use
+      const options = { path: '/', domain: window.location.hostname.includes('localhost') ? 'localhost' : 'aayumalunhydro.com.np' };
+      
+      deleteCookie('token', options);
+      
+      // 2. Clear common fallback (without explicit domain)
+      deleteCookie('token', { path: '/' });
 
-      if (response.ok) {
-        toast.success("Logout successful");
-        router.push("/admin/login");
-      } else {
-        console.error("Logout failed");
-        toast.error("Logout failed");
-      }
+      // 3. Optional: If your backend has a logout endpoint, call it here
+      // await axios.post('/api/auth/logout');
+
+      toast.success("Logout successful");
+      
+      // 4. Force a hard redirect to ensure state is wiped
+      window.location.href = '/admin/login'; 
+      
     } catch (error) {
-      console.error("Logout failed", error);
+      console.error("Logout error:", error);
+      toast.error("Logout failed");
     } finally {
       setIsLoggingOut(false);
-      setIsLogoutModalOpen(false);
     }
   };
-  // LOGOUT API INTEGRATED END
+  // LOGOUT API INTEGRATED END 
 
   return (
     <>

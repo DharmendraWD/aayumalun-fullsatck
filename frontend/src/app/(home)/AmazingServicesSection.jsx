@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Briefcase, Zap, Users, DollarSign, HardHat } from 'lucide-react'; 
-import RoundedBgBtn from '@/components/Buttons/RoundedBgBtn';
+import RoundedBgBtn from '../../components/Buttons/RoundedBgBtn';
 
 // Data for the service cards (unchanged)
 const servicesData = [

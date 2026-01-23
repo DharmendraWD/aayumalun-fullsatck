@@ -18,7 +18,7 @@ export const getAllFAQs = createAsyncThunk(
       }
       
       const data = await res.json();
-      console.log(data.data)
+      // console.log(data.data)
       return data.data;
     } catch (err) {
       toast.error(err.message || "Failed to fetch FAQs");
@@ -41,7 +41,7 @@ export const createFAQ = createAsyncThunk(
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
+          // credentials: "include",
           body: JSON.stringify(faqData),
         }
       );
@@ -76,7 +76,7 @@ export const updateFAQ = createAsyncThunk(
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
+          // credentials: "include",
           body: JSON.stringify(faqData),
         }
       );
@@ -108,7 +108,7 @@ export const deleteFAQ = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/faqs/${faqId}`,
         {
           method: "DELETE",
-          credentials: "include",
+          // credentials: "include",
         }
       );
 

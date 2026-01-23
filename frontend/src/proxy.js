@@ -1,8 +1,5 @@
-
-
 import { NextResponse } from "next/server";
 
-// --- Protected Routes ---
 const PROTECTED_ROUTES = [
   "/admin/dashboard",
   "/admin/hero",
@@ -14,75 +11,73 @@ const PROTECTED_ROUTES = [
   "/admin/messages",
   "/admin/faqs",
   "/admin/others",
-  "/admin/user-management",
+  "/admin/manage-users",
   "/admin/change-password",
 ];
 
-function isProtectedRoute(pathname) {
-  return PROTECTED_ROUTES.some(route => pathname.startsWith(route));
-}
+export default async function middleware(req) {
+  const { pathname } = req.nextUrl;
 
-export default async function proxy(req) {
-  const { nextUrl } = req;
-  const pathname = nextUrl.pathname;
-
-  console.log("Proxy running on:", pathname);
-
-  // --- Extract token once ---
-  const token =
-    req.cookies.get("token")?.value ||
-    req.headers.get("authorization")?.replace("Bearer ", "");
-
-  //  Redirect logged-in users away from /login
-  if (pathname === "/admin/login" && token) {
-    return NextResponse.redirect(new URL("/admin/dashboard", req.url)); 
-  }
-
-  // If token exists, verify it, verify token if it is changed or not, if token in not valid then send to login
-  if (token && pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    try {
-      console.log("first")
-      const response = await fetch(`${process.env.BASE_API}/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-        credentials: 'include',
-        cache: 'no-store'
-      });
-
-      if (!response.ok) {
-        const loginUrl = new URL('/admin/login', req.url);
-        const res = NextResponse.redirect(loginUrl);
-        res.cookies.delete('token');
-        return res;
-      }
-
-      console.log(response.ok)
-
-  return NextResponse.next();
-    } catch (error) {
-      console.error("Auth check failed:", error);
-      const loginUrl = new URL('/admin/login', req.url);
-      const res = NextResponse.redirect(loginUrl);
-      res.cookies.delete('token');
-      return res;
-    }
-  }
-
-  // ⭐ If route NOT protected → allow
-  if (!isProtectedRoute(pathname)) {
+  // Only care about admin routes
+  if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
-  // ⭐ Protected route but no token → send to login
-  if (!token) {
-    const url = new URL("/admin/login", req.url);
-    url.searchParams.set("unauth", "1");
-    return NextResponse.redirect(url);
+  const isProtected = PROTECTED_ROUTES.some(route =>
+    pathname.startsWith(route)
+  );
+
+  const cookieHeader = req.headers.get("cookie") || "";
+
+  // 👉 LOGIN PAGE
+  if (pathname === "/admin/login") {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/me`, {
+        headers: {
+          cookie: cookieHeader,
+        },
+        credentials: "include",
+      });
+
+      // Token valid → redirect to dashboard
+      if (res.ok) {
+        return NextResponse.redirect(
+          new URL("/admin/dashboard", req.url)
+        );
+      }
+    } catch (err) {
+      // ignore
+    }
+
+    // Token missing / invalid → allow login page
+    return NextResponse.next();
   }
 
-  // ⭐ Everything OK → allow access
+  // 👉 PROTECTED ROUTES
+  if (isProtected) {
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/me`, {
+        headers: {
+          cookie: cookieHeader,
+        },
+        credentials: "include",
+      });
+
+      if (!res.ok) {
+        throw new Error("Unauthorized");
+      }
+
+      return NextResponse.next();
+    } catch (err) {
+      return NextResponse.redirect(
+        new URL("/admin/login", req.url)
+      );
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/:path*"],
+  matcher: "/admin/:path*",
 };

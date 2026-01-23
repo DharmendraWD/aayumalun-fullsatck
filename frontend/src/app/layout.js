@@ -2,11 +2,9 @@
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import ToastProvider from "../components/toast/ToastProvider";
-import Footer from "@/components/Misc/Footer/Footer";
 
 import localFont from "next/font/local";
-import AOSInit from "@/components/AOSInit";
-import Navbar from "@/components/Header/Navbar/Navbar";
+import AOSInit from "../components/AOSInit";
 
 
 const myFont = localFont({

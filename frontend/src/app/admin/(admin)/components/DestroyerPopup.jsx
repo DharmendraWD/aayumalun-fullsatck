@@ -41,7 +41,7 @@ export default function DestroyerPopup({ isOpen, onClose, title, children, prima
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: "spring", duration: 0.4, bounce: 0.4 }}
-            className="relative w-full max-w-[50%] bg-white rounded-[2.5rem] shadow-[0_25px_70px_-15px_rgba(0,0,0,0.4)] p-8 md:p-10 z-[100000]"
+            className="relative w-full lg:max-w-[50%] max-w-[97%] bg-white rounded-[2.5rem] shadow-[0_25px_70px_-15px_rgba(0,0,0,0.4)] p-8 md:p-10 z-[100000]"
           >
             {!loading && (
               <button 

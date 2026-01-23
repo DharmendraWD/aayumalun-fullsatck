@@ -1,8 +1,8 @@
 import React from 'react';
 import wp from "../../../../public/img/wp1.jpg"
 import { Form } from './Form';
-import Navbar from '@/components/Header/Navbar/Navbar';
-import Footer from '@/components/Misc/Footer/Footer';
+import Navbar from '../../../components/Header/Navbar/Navbar';
+import Footer from '../../../components/Misc/Footer/Footer';
 import Image from 'next/image';
 import Link from 'next/link';
 import HTMLReactParser from 'html-react-parser';

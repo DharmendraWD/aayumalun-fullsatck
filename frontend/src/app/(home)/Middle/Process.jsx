@@ -2,7 +2,7 @@
 import React from 'react';
 import arrow from "../../../../public/arrow.png";
 import Image from 'next/image';
-import RoundedBgBtn from '@/components/Buttons/RoundedBgBtn';
+import RoundedBgBtn from '../../../components/Buttons/RoundedBgBtn';
 
 // Data for the three process steps
 const processSteps = [

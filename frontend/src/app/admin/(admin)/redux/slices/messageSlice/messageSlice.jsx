@@ -52,7 +52,7 @@ export const deleteMessage = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/clientmessage/${messageId}`,
         {
           method: "DELETE",
-          credentials: "include",
+          // credentials: "include",
         }
       );
 

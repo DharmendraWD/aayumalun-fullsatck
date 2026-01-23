@@ -1,4 +1,3 @@
-import RoundedBgBtn from "@/components/Buttons/RoundedBgBtn";
 import Link from "next/link";
 
 // This is a Server Component by default in Next.js App Router

@@ -4,7 +4,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 const path = require("path");
-const multer = require("multer"); // ✅ Add this
+const multer = require("multer"); 
 const { dbConnection } = require("./db/dbConn");
 const cookieParser = require("cookie-parser");
 
@@ -14,11 +14,11 @@ const contentRoutes = require("./routes/content.routes");
 dbConnection();
 
 // cors 
-app.set("trust proxy", 1);
 const allowedOrigins = [
+  "http://localhost:3000",
   "https://aayumalunhydro.com.np",
-  "http://localhost:3000"
 ];
+app.set("trust proxy", 1);
 
 app.use(
   cors({
@@ -30,11 +30,9 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
-
+// cors 
 app.use(cookieParser());
 // middlewares
 app.use(express.json());

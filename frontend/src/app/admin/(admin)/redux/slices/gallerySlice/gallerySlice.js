@@ -36,7 +36,7 @@ export const createGallery = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/gallery`,
         {
           method: "POST",
-          credentials: "include",
+          // credentials: "include",
           body: formData,
         }
       );
@@ -69,7 +69,7 @@ export const deleteGallery = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/gallery/${imagePath}`,
         {
           method: "DELETE",
-          credentials: "include",
+          // credentials: "include",
         }
       );
 

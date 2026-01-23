@@ -8,7 +8,6 @@ async function getAboutUsData() {
     const res = await fetch(
       `${process.env.BASE_API}/contents/aboutus`,
       {
-        cache: 'no-store',
         next: { revalidate: 60 }
       }
     );
@@ -31,7 +30,6 @@ async function getAboutUsImages() {
     const res = await fetch(
       `${process.env.BASE_API}/contents/aboutusimg`,
       {
-        cache: 'no-store',
         next: { revalidate: 60 }
       }
     );

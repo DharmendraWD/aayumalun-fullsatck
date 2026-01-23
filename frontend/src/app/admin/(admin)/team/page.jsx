@@ -19,6 +19,7 @@ import {
 import Loading from "../components/Loading";
 import toast from "react-hot-toast";
 import DestroyerPopup from "../components/DestroyerPopup";
+import Image from "next/image";
 
 export default function TeamPage() {
   const dispatch = useDispatch();
@@ -122,7 +123,7 @@ export default function TeamPage() {
 
       <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
         {/* HEADER */}
-        <header className="flex justify-between items-center mb-10">
+        <header className="flex justify-between items-center mb-10 lg:flex-row flex-col">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900 flex items-center gap-3">
               <HiOutlineUserGroup className="text-indigo-600" />
@@ -149,7 +150,10 @@ export default function TeamPage() {
               >
                 {/* Image Section */}
                 <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-indigo-50 to-purple-50">
-                  <img
+                  <Image
+                    width={500}
+                    height={500}
+                    unoptimized
                     src={
                       process.env.NEXT_PUBLIC_BASE_CONTENT_URL +
                       "uploads/team/" +

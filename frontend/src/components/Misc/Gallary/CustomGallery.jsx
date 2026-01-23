@@ -1,6 +1,6 @@
 // components/CustomGallery.jsx
 import Image from 'next/image';
-import H1 from '@/components/Heading/H1';
+import H1 from '../../Heading/H1';
 
 const CustomGallery = async () => {
   let images = [];

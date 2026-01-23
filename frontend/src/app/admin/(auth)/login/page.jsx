@@ -7,63 +7,89 @@ import logo from "../../../../../public/aayulogo.png"
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import "../../../admin/admin.css"
-import { CgSpinner } from 'react-icons/cg'; // Add this for a nice loader
-
+import { CgSpinner } from 'react-icons/cg';
 import DialogueModal from '../../(admin)/components/DialogueModal';
 import toast from 'react-hot-toast';
+import { setCookie } from 'cookies-next'; // Install: npm install cookies-next
+
 
 export default function LoginPage() {
-  // show hide password when user enter
   const [showPassword, setShowPassword] = useState(false);
-  // State to control modal;
   const [isModalOpen, setIsModalOpen] = useState(false); 
-
-  // API INTEGRATING 
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState({ email: "", password: "" });
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
+// frontend login page
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError("");
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-        // Important: allows the browser to accept the cookie set by backend
-        credentials: "include", 
-      });
+  try {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/users/login`, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+      },
+        credentials: "include",
+      body: JSON.stringify(formData),
+    });
 
-      const data = await response.json();
-      // console.log(data)
+    const data = await response.json();
 
-      if (response.ok) {
-        // Redirect to dashboard on success
+    if (response.ok && data.token) {
+      // Set cookie
+  //     setCookie('token', data.token, {
+  //       maxAge: 30 * 24 * 60 * 60,
+  //       path: '/',
+  //    secure: process.env.NODE_ENV === "production",
+  // sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  //     });
+
+
+      setCookie("token", data.token, {
+  maxAge: 30 * 24 * 60 * 60,
+  path: "/",
+  secure: process.env.NODE_ENV === "production",
+  sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  domain: process.env.NODE_ENV === "production"
+    ? ".aayumalunhydro.com.np"
+    : "localhost",
+});
+
+
+      toast.success("Login successful!");
+      
+      // Small delay to ensure cookie is set
+      setTimeout(() => {
         router.push("/admin/dashboard");
-      } else {
-        setError(data.message || "Invalid credentials. Please try again.");
-        toast.error(data.message || "Invalid credentials. Please try again.");
-      }
-    } catch (err) {
-      setError("Network error. Please check your connection.");
-    } finally {
-      setLoading(false);
+      }, 100);
+      
+    } else {
+      setError(data.message || "Invalid credentials. Please try again.");
+      toast.error(data.message || "Invalid credentials. Please try again.");
     }
-  };
-  // API INTEGRATING END
+  } catch (err) {
+    console.error("Login error:", err);
+    setError("Network error. Please check your connection.");
+    toast.error("Network error. Please check your connection.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+
+
+
 
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center lg:p-0 p-4">
-      {/* Main Container */}
       <div className="max-w-5xl w-full bg-white rounded-[2rem] shadow-2xl flex overflow-hidden min-h-[600px]">
         
-        {/* Left Side: Aesthetic Visual (Hidden on mobile) */}
+        {/* Left Side */}
         <div className="hidden lg:flex lg:w-1/2 bg-[#c800c099] relative overflow-hidden flex-col justify-center p-12 text-white">
-          {/* Animated Background SVGs */}
           <div className="absolute top-0 left-0 w-full h-full opacity-10">
             <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
               <defs>
@@ -78,8 +104,7 @@ export default function LoginPage() {
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
 
           <div className="relative z-10">
-<Image src={logo} alt="logo" className="w-20 h-20 mb-4 mx-auto" />
-
+            <Image src={logo} alt="logo" className="w-20 h-20 mb-4 mx-auto" />
             <h2 className="text-4xl font-bold mb-6 leading-tight">
               Manage your <br /> 
               <span className="text-indigo-200 underline decoration-wavy decoration-indigo-300">Digital Presence</span> <br /> 
@@ -112,10 +137,10 @@ export default function LoginPage() {
                   <HiOutlineMail size={20} />
                 </div>
                 <input 
-                 required
-          type="email" 
-          value={formData.email}
-          onChange={(e) => setFormData({...formData, email: e.target.value})}
+                  required
+                  type="email" 
+                  value={formData.email}
+                  onChange={(e) => setFormData({...formData, email: e.target.value})}
                   placeholder="admin@example.com"
                   className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all placeholder:text-slate-400 text-slate-700"
                 />
@@ -124,18 +149,15 @@ export default function LoginPage() {
 
             {/* Password Input */}
             <div className="space-y-2">
-              <div className="flex justify-between items-center ml-1">
-                {/* <label className="text-sm font-bold text-slate-700">Password</label>
-                <a href="#" className="text-xs font-bold text-indigo-600 hover:text-indigo-500 transition-colors">Forgot Password?</a> */}
-              </div>
+              <label className="text-sm font-bold text-slate-700 ml-1">Password</label>
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400 group-focus-within:text-indigo-500 transition-colors">
                   <HiOutlineLockClosed size={20} />
                 </div>
                 <input 
-                required
-          value={formData.password}
-          onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  required
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
                   type={showPassword ? "text" : "password"} 
                   placeholder="••••••••"
                   className="w-full pl-11 pr-12 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all placeholder:text-slate-400 text-slate-700"
@@ -150,25 +172,25 @@ export default function LoginPage() {
               </div>
             </div>
 
-         {/* Submit Button with Loading State */}
-      <button 
-        type="submit"
-        disabled={loading}
-        className={`w-full flex items-center justify-center gap-2 font-bold py-4 rounded-2xl transition-all shadow-xl 
-          ${loading 
-            ? "bg-indigo-400 cursor-not-allowed text-white/80" 
-            : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100 hover:shadow-indigo-200 active:scale-[0.98]"
-          }`}
-      >
-        {loading ? (
-          <>
-            <CgSpinner className="animate-spin" size={24} />
-            <span>Authenticating...</span>
-          </>
-        ) : (
-          "Sign In to Dashboard"
-        )}
-      </button>
+            {/* Submit Button */}
+            <button 
+              type="submit"
+              disabled={loading}
+              className={`w-full flex items-center justify-center gap-2 font-bold py-4 rounded-2xl transition-all shadow-xl 
+                ${loading 
+                  ? "bg-indigo-400 cursor-not-allowed text-white/80" 
+                  : "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-100 hover:shadow-indigo-200 active:scale-[0.98]"
+                }`}
+            >
+              {loading ? (
+                <>
+                  <CgSpinner className="animate-spin" size={24} />
+                  <span>Authenticating...</span>
+                </>
+              ) : (
+                "Sign In to Dashboard"
+              )}
+            </button>
 
             {/* Divider */}
             <div className="relative py-4">
@@ -178,30 +200,27 @@ export default function LoginPage() {
               <div className="relative cursor-pointer flex justify-center text-xs uppercase"
                 onClick={() => setIsModalOpen(true)}
               >
-                <span className="bg-white text-indigo-600 font-bold hover:bg-[#c0cbff21] transition duration-300 ease-in-out rounded-full px-[5px] pb-[4px] hover:text-indigo-700 tracking-widest">Ahh I don't have an Account  <span className='text-[28px] abolute top-[13px]'>&#x1F926;</span> </span>
+                <span className="bg-white text-indigo-600 font-bold hover:bg-[#c0cbff21] transition duration-300 ease-in-out rounded-full px-[5px] pb-[4px] hover:text-indigo-700 tracking-widest">
+                  Ahh I don't have an Account <span className='text-[28px] abolute top-[13px]'>&#x1F926;</span>
+                </span>
               </div>
             </div>
-
-    
           </form>
 
-
-
-      {/* --- REUSABLE MODAL INSTANCE --- */}
-      <DialogueModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)}
-        title="Account Access"
-      >
-        <p>
-          To maintain security, accounts are created exclusively by the 
-          <span className="font-bold text-indigo-600"> Main Administrator</span>.
-        </p>
-        <p className="mt-4 text-sm">
-          Please reach out to your department head to receive your official credentials. 
-          Once provided, you can log in here to access your dashboard.
-        </p>
-      </DialogueModal>
+          <DialogueModal 
+            isOpen={isModalOpen} 
+            onClose={() => setIsModalOpen(false)}
+            title="Account Access"
+          >
+            <p>
+              To maintain security, accounts are created exclusively by the 
+              <span className="font-bold text-indigo-600"> Main Administrator</span>.
+            </p>
+            <p className="mt-4 text-sm">
+              Please reach out to your department head to receive your official credentials. 
+              Once provided, you can log in here to access your dashboard.
+            </p>
+          </DialogueModal>
         </div>
       </div>
     </div>

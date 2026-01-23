@@ -36,7 +36,7 @@ export const createTeam = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/team`,
         {
           method: "POST",
-          credentials: "include",
+          // credentials: "include",
           body: formData,
         }
       );
@@ -69,7 +69,7 @@ export const deleteTeam = createAsyncThunk(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/team/${id}`,
         {
           method: "DELETE",
-          credentials: "include",
+          // credentials: "include",
         }
       );
 

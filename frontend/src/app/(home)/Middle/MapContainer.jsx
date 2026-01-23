@@ -3,7 +3,7 @@
 
 import Image from 'next/image'; // For optimized images
 import { getClientData } from './mapData'; // Adjust path as necessary
-import RoundedBgBtn from '@/components/Buttons/RoundedBgBtn';
+import RoundedBgBtn from '../../../components/Buttons/RoundedBgBtn';
 
 export default async function ClientMapSection() {
   // Data fetching on the server

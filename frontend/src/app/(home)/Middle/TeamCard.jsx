@@ -58,8 +58,8 @@ const TeamCarousel = () => {
   if (loading) {
     return (
       <div className="team-section max-w-[1440px] mx-auto" id="about-teams">
-        <div className="team-header flex lg:flex-row gap-8 items-start max-w-[100%] w-full flex-col">
-          <h1>Meet the talented team who make all this happen</h1>
+        <div className="flex lg:flex-row gap-8 items-start max-w-[100%] w-full flex-col">
+          <h1 className="" style={{color:"black !important"}}>Meet the talented team who make all this happen</h1>
           <p className="font-semibold "> 
             Our philosophy is simple, hire great people and give them the
             resources and support to do their best work.
@@ -114,8 +114,8 @@ const TeamCarousel = () => {
             <div>
               <img src={member.img} alt={member?.name} className="team-img mx-auto" />
             </div>
-            <h3 className="font-semibold">{member?.name}</h3>
-            <h3 className="font-semibold">{member?.designation}desi</h3>
+            <h3 className="font-semibold text-gray-900">{member?.name}</h3>
+            <h3 className="font-semibold text-gray-900">{member?.designation}</h3>
             {/* <h4 className="font-semibold ">{member?.title}</h4> */}
             <p className="max-h-[100px] overflow-scroll my-scroll text-gray-600 font-semibold ">{member.desc}</p>
           </div>

@@ -155,6 +155,70 @@ const changePassword = async (req, res) => {
 
 
 // login user api 
+// didnt work when set cookie from backend
+// const login = async (req, res) => {
+//   try {
+//     const { email, password } = req.body;
+
+//     const [rows] = await pool.query(
+//       "SELECT * FROM users WHERE email = ?",
+//       [email]
+//     );
+
+//     if (rows.length === 0) {
+//       return res.status(401).json({ success: false, message: "User not found" });
+//     }
+
+//     const user = rows[0];
+
+//     if (!bcrypt.compareSync(password, user.password)) {
+//       return res.status(401).json({ success: false, message: "Invalid password" });
+//     }
+
+//     //  remove password before sending response
+//     const { password: _, ...userWithoutPassword } = user;
+
+//     // Create JWT token
+//     const token = jwt.sign(
+//       { 
+//         email: user.email,
+//         userId: user.id ,
+//         fullName: user?.fullName
+//       },
+//       process.env.JWT_SECRET || '', 
+//       { expiresIn: '30d' }
+//     );
+
+//       // 3. set cookie 
+//   res.cookie("token", token, {
+//     httpOnly: true,   // not accessible via JS
+//     secure: true,     // HTTPS only (false in local dev)
+//     sameSite: "strict",
+//     maxAge: 30 * 24 * 60 * 60 * 1000,
+//   });
+
+//     // Send success response
+//    return res.status(200).json({
+//       success: true,
+//       message: "Login successful",
+//       token: token,
+//       user: {
+//         id: user.id,
+//         email: user.email,
+//         fullName: user.fullName
+//       }
+//     });
+
+
+//   } catch (error) {
+//     console.error("Server Error:", error);
+//     res.status(500).json({
+//       success: false,
+//       message: error.message || "Server error",
+//     });
+//   }
+// };
+
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -174,40 +238,28 @@ const login = async (req, res) => {
       return res.status(401).json({ success: false, message: "Invalid password" });
     }
 
-    //  remove password before sending response
-    const { password: _, ...userWithoutPassword } = user;
-
     // Create JWT token
     const token = jwt.sign(
       { 
         email: user.email,
-        userId: user.id ,
+        userId: user.id,
         fullName: user?.fullName
       },
       process.env.JWT_SECRET || '', 
       { expiresIn: '30d' }
     );
 
-      // 3. set cookie 
-  res.cookie("token", token, {
-    httpOnly: true,   // not accessible via JS
-    secure: true,     // HTTPS only (false in local dev)
-    sameSite: "strict",
-    maxAge: 30 * 24 * 60 * 60 * 1000,
-  });
-
-    // Send success response
-   return res.status(200).json({
+    // Send success response with token
+    return res.status(200).json({
       success: true,
       message: "Login successful",
-      token: token,
+      token: token, // Send token in response
       user: {
         id: user.id,
         email: user.email,
         fullName: user.fullName
       }
     });
-
 
   } catch (error) {
     console.error("Server Error:", error);
@@ -217,6 +269,8 @@ const login = async (req, res) => {
     });
   }
 };
+
+
 
 // getlogged in user details 
 const getLoggedInUserDetails = async (req, res) => {
@@ -240,7 +294,7 @@ const getLoggedInUserDetails = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: "User details fetched successfully",
+      message: "User details fetched successfullyyy",
       user: {
         id: user.id,
         email: user.email,
@@ -252,6 +306,7 @@ const getLoggedInUserDetails = async (req, res) => {
       }
     });
 }
+
 
 // log out user api 
 const logOutUser = async (req, res) => {

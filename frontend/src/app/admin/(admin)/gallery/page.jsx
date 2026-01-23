@@ -114,7 +114,7 @@ export default function GalleryPage() {
 
       <div className="max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700">
         {/* HEADER */}
-        <header className="flex justify-between items-center mb-10">
+        <header className="flex justify-between lg:flex-row flex-col  items-center mb-10">
           <div>
             <h1 className="text-3xl font-extrabold text-slate-900 flex items-center gap-3">
               <HiOutlineCollection className="text-indigo-600" />

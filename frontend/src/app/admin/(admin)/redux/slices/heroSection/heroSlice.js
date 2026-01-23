@@ -74,7 +74,7 @@ export const createHeroSectionImage = createAsyncThunk(
 
       const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/contents/herosectionimg`, {
         method: 'POST',
-        credentials: 'include',
+        // credentials: 'include',
         body: formData,
       });
 
@@ -102,7 +102,7 @@ export const deleteHeroSectionImage = createAsyncThunk(
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/contents/herosectionimg/${id}`, {
                 method: 'DELETE',
-                credentials: 'include',
+                // credentials: 'include',
             });
             const data = await res.json();
             if (!res.ok) {
@@ -127,7 +127,7 @@ export const editHeroSection = createAsyncThunk(
         try {
             const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_API}/contents/herosection`, {
                 method: 'PUT',
-                credentials: 'include',
+                // credentials: 'include',
                 body: formData,
             });
             const data = await res.json();
