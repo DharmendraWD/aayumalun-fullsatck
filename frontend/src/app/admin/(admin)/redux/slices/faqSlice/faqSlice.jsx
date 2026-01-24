@@ -1,5 +1,6 @@
 // redux/slices/faqSlice/faqSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getCookie } from "cookies-next";
 import toast from "react-hot-toast";
 
 /* ============================
@@ -34,12 +35,15 @@ export const createFAQ = createAsyncThunk(
   "faqs/create",
   async (faqData, thunkAPI) => {
     try {
+                   const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/faqs`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           // credentials: "include",
           body: JSON.stringify(faqData),
@@ -69,12 +73,14 @@ export const updateFAQ = createAsyncThunk(
   "faqs/update",
   async ({ id, faqData }, thunkAPI) => {
     try {
+                   const token = getCookie('token'); // read from cookie
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/faqs/${id}`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           // credentials: "include",
           body: JSON.stringify(faqData),
@@ -104,11 +110,16 @@ export const deleteFAQ = createAsyncThunk(
   "faqs/delete",
   async (faqId, thunkAPI) => {
     try {
+                     const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/faqs/${faqId}`,
         {
           method: "DELETE",
           // credentials: "include",
+           headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
         }
       );
 

@@ -1,5 +1,6 @@
 // redux/slices/otherSlice/otherSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getCookie } from "cookies-next";
 import toast from "react-hot-toast";
 
 /* ============================
@@ -47,12 +48,16 @@ export const updateOtherData = createAsyncThunk(
   "other/update",
   async (otherData, thunkAPI) => {
     try {
+
+             const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/other`,
         {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           // credentials: "include",
           body: JSON.stringify(otherData),

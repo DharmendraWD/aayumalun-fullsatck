@@ -1,6 +1,7 @@
 // redux/slices/teamSlice/teamSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
+import { getCookie } from 'cookies-next';
 
 /* ============================
    GET ALL TEAM MEMBERS
@@ -32,11 +33,15 @@ export const createTeam = createAsyncThunk(
   "team/create",
   async (formData, thunkAPI) => {
     try {
+             const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/team`,
         {
           method: "POST",
-          // credentials: "include",
+           headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
           body: formData,
         }
       );
@@ -65,11 +70,15 @@ export const deleteTeam = createAsyncThunk(
   "team/delete",
   async (id, thunkAPI) => {
     try {
+             const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/team/${id}`,
         {
           method: "DELETE",
-          // credentials: "include",
+           headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
         }
       );
 

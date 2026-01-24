@@ -1,5 +1,6 @@
 // redux/slices/aboutusSlice/aboutUsSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getCookie } from "cookies-next";
 import toast from "react-hot-toast";
 
 /* ============================
@@ -87,11 +88,16 @@ export const createAboutUsImage = createAsyncThunk(
   "aboutUs/images/create",
   async (formData, thunkAPI) => {
     try {
+                   const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/aboutusimg`,
         {
           method: "POST",
-          credentials: "include",
+          // credentials: "include",
+           headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
           body: formData,
         }
       );

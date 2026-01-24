@@ -1,5 +1,6 @@
 // redux/slices/missionSlice/missionSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { getCookie } from "cookies-next";
 import toast from "react-hot-toast";
 
 /* ============================
@@ -33,11 +34,16 @@ export const editMission = createAsyncThunk(
   async (formData, thunkAPI) => {
     // console.log(formData)
     try {
+                         const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/mission`,
         {
           method: "PUT", //  Changed to PUT to match backend route
           // credentials: "include",
+              headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
           body: formData,
         }
       );
@@ -66,6 +72,7 @@ export const getMissionImages = createAsyncThunk(
   "mission/images/get",
   async (_, thunkAPI) => {
     try {
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/missionimg`
       );
@@ -88,12 +95,17 @@ export const getMissionImages = createAsyncThunk(
 export const createMissionImage = createAsyncThunk(
   "mission/images/create",
   async (formData, thunkAPI) => {
+    
     try {
+      const token = getCookie('token'); // read from cookie
+      
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/missionimg`,
         {
           method: "PUT", //  Changed to PUT to match backend route
-          // credentials: "include",
+           headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
           body: formData,
         }
       );
@@ -122,11 +134,15 @@ export const deleteMissionImage = createAsyncThunk(
   "mission/images/delete",
   async (imageType, thunkAPI) => {
     try {
+             const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/missionimg/${imageType}`,
         {
           method: "DELETE",
-          // credentials: "include",
+           headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
         }
       );
 
