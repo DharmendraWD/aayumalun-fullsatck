@@ -7,23 +7,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import HTMLReactParser from 'html-react-parser';
 
-const STATISTICS = [
-    { value: "500k", label: "cost savings" },
-    { value: "$500k", label: "cost savings" },
-    { value: "95%", label: "customer satisfactions" },
-    { value: "5%", label: "market shares growth" },
-];
 
-const StatCard = ({ stat }) => (
-    <div className="bg-[#e9e9e9] p-6 rounded-[24px] shadow-2xl text-center h-full transition duration-300 hover:shadow-blue-300/50">
-        <p className="text-4xl sm:text-5xl font-extrabold text-indigo-700 mb-1">
-            {stat.value}
-        </p>
-        <p className="text-sm font-medium text-gray-500 uppercase tracking-wider">
-            {stat.label}
-        </p>
-    </div>
-);
 
 // Function to format date
 const formatDate = (dateString) => {
@@ -91,7 +75,7 @@ export default async function NewsDets(props) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">Blog Not Found</h1>
+                    <h1 className="text-4xl font-bold text-gray-800 mb-4">This Specific Blog Not Found</h1>
                     <p className="text-gray-600 mb-6">The blog you're looking for doesn't exist.</p>
                     <Link href="/" className="text-blue-600 hover:text-blue-800 font-medium">
                         Go back to Home
