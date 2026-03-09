@@ -34,8 +34,8 @@ Follow these steps to run the project locally:
 ### 1. Clone the Repository
 
 ```bash
-git clone <your-repo-url>
-cd <repo-folder>
+git clone https://github.com/DharmendraWD/aayumalun-fullsatck
+cd aayumalun-fullsatck
 ```
 
 ## Create a .env file in the backend folder with the following content:
