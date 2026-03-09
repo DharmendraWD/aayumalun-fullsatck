@@ -1,5 +1,14 @@
 # Dynamic Next.js Website with Express & MySQL ✅✅
+#
+
+## Preview
+[link text](https://aayumalunhydro.com.np)
 <img src="./Capture.PNG" alt="Website Screenshot" />
+
+## Admin Panel
+[link text](https://aayumalunhydro.com.np/admin/login)
+<img src="./Capture2.PNG" alt="Website Screenshot" />
+ 
 
 # Dynamic Next.js Website with Express & MySQL
 
