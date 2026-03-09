@@ -33,11 +33,16 @@ export const editAboutUs = createAsyncThunk(
   "aboutUs/edit",
   async (formData, thunkAPI) => {
     try {
+                         const token = getCookie('token'); // read from cookie
+
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_API}/contents/aboutus`,
         {
           method: "PUT",
-          credentials: "include",
+          // credentials: "include",
+            headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
           body: formData,
         }
       );

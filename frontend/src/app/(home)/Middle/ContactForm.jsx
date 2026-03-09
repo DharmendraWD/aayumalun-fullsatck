@@ -1,6 +1,5 @@
 // components/ContactForm.jsx
 "use client";
-
 import React, { useEffect, useState } from 'react';
 import { MdEmail, MdPhone, MdLocationOn, MdCheckCircle } from 'react-icons/md';
 import { FaLinkedinIn, FaTwitter, FaTelegramPlane, FaInstagram, FaYoutube, FaFacebook } from 'react-icons/fa';

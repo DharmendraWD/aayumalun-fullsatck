@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import Image from "next/image";
 import Link from "next/link";
 
@@ -72,7 +73,7 @@ export default async function NewsAndCaseStudy() {
   try {
     const apiUrl = `${process.env.BASE_API}/contents/blogs`;
     const response = await fetch(apiUrl, {
-      next: { revalidate: 3600 } // Revalidate every hour
+      cache: "no-store"
     });
 
     if (!response.ok) {

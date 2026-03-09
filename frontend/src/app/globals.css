@@ -78,7 +78,7 @@ a{
   font-size: 32px;
   font-weight: 700;
   margin-bottom: 10px;
-  color: black I !important;
+  color: black  !important;
 }
 
 .team-header p {
@@ -163,3 +163,4 @@ html {
   /* Standard syntax for Chrome, Firefox, and Edge */
   backdrop-filter: blur(7px);
 }
+

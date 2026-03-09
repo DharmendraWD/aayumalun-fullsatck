@@ -104,7 +104,7 @@ const handleLogin = async (e) => {
           <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-pulse"></div>
 
           <div className="relative z-10">
-            <Image src={logo} alt="logo" className="w-20 h-20 mb-4 mx-auto" />
+            <Image src={logo} alt="logo" className="w-20  h-20 mb-4 mx-auto" />
             <h2 className="text-4xl font-bold mb-6 leading-tight">
               Manage your <br /> 
               <span className="text-indigo-200 underline decoration-wavy decoration-indigo-300">Digital Presence</span> <br /> 

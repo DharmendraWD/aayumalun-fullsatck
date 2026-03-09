@@ -24,12 +24,24 @@ const geistMono = Geist_Mono({
 
 export const metadata = {
   title: "Aayumalun",
-  description: "  Aayumalun is a company that constructs hydropower structures and creates projects that inspire confidence, stand strong against time, and deliver reliable clean energy to the people who live and work in the region.",
+  description: "  Puwakhola Hydro is a company that constructs hydropower structures and creates projects that inspire confidence, stand strong against time, and deliver reliable clean energy to the people who live and work in the region.",
 };
 
 export default function RootLayout({ children }) {
+
   return (
-    <html lang="en" className={myFont.variable}>
+    <html lang="en" className={`${myFont.variable}`}>
+      <head>
+        <noscript>
+          <style>{`
+            [data-aos] {
+              opacity: 1 !important;
+              transform: none !important;
+            }
+          `}</style>
+          
+        </noscript>
+      </head>
       <body
         className={`${myFont.variable}`}
       >

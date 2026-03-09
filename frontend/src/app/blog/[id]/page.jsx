@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import React from 'react';
 import wp from "../../../../public/img/wp1.jpg"
 import { Form } from './Form';
@@ -31,7 +33,7 @@ export default async function NewsDets(props) {
         // Fetch the specific blog
         const blogApiUrl = `${process.env.BASE_API}/contents/blogs/${id}`;
         const blogResponse = await fetch(blogApiUrl, {
-            next: { revalidate: 3600 }
+            cache: "no-store"
         });
 
         if (!blogResponse.ok) {
@@ -43,7 +45,7 @@ export default async function NewsDets(props) {
         // Fetch all blogs for "Other Blogs" section
         const allBlogsApiUrl = `${process.env.BASE_API}/contents/blogs`;
         const allBlogsResponse = await fetch(allBlogsApiUrl, {
-            next: { revalidate: 3600 }
+            cache: "no-store"
         });
 
         if (allBlogsResponse.ok) {
@@ -215,22 +217,6 @@ export default async function NewsDets(props) {
     );
 }
 
-// Newsletter Sidebar Component
-const NewsletterSidebar = () => {
-    return (
-        <>
-            <div className="p-8 bg-indigo-700 rounded-3xl sticky top-8 md:top-12 self-start shadow-xl">
-                <h3 className="text-2xl font-bold text-white mb-2">
-                    Join newsletter
-                </h3>
-                <p className="text-indigo-200 text-sm mb-6">
-                    Stay up to date with new case studies. We promise no spam, just good content.
-                </p>
-                <Form></Form>
-            </div>
-        </>
-    );
-};
 
 // Main Case Study Content Component
 const NewsStudy = ({ blog }) => {

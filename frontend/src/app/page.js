@@ -26,17 +26,12 @@ export default function Home() {
 <NewsAndCaseStudy></NewsAndCaseStudy>
     <ContactForm></ContactForm>
     <FAQSection></FAQSection>
-    <FooterHero></FooterHero>
+<FooterHero></FooterHero>
     <Footer></Footer>
 
 
-{/* 
-<MajorProjects></MajorProjects>
-<AmazingServices></AmazingServices>
-<Process></Process> */}
+
 {/* <TestimonialSlider></TestimonialSlider> */}
-{/* <ClientMapSection></ClientMapSection> */}
-{/* <TeamProfile></TeamProfile> */}
     </>
   );
 }

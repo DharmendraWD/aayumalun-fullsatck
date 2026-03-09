@@ -109,7 +109,7 @@ const ClientCarousel = async () => {
 
       {/* First Card - Where we Operate */}
       <Card className="bg-white mt-4 mb-4 text-white lg:col-span-2 lg:row-span-1 h-full relative overflow-hidden">
-        <div className='flex md:flex-row flex-col items-start justify-between'>
+        <div className='flex lg:flex-row flex-col items-start justify-between'>
           <div className='w-[90%]'>
             <h3 className="text-xl font-bold mb-4 opacity-75 text-gray-900">
               {data.firstCardHeading}
@@ -118,8 +118,13 @@ const ClientCarousel = async () => {
               <div className="absolute inset-0 bg-repeat [background-image:radial-gradient(currentColor_1px,_transparent_1px)] [background-size:20px_20px]"></div>
             </div>
             <div className="relative z-10">
-              <p data-aos="zoom-out-up" className="text-lg leading-relaxed max-w-2x text-gray-900">
-                {data.firstCardPara}
+              <p data-aos="zoom-out-up" className="text-lg leading-relaxed  max-w-[100%] lg:max-w-2x text-gray-900">
+                {/* {data.firstCardPara} */}
+                The 21 MW Aayu Malun Khola Hydropower Project is a strategically developed run-of-river hydropower initiative situated in the former Sagarmatha Zone of Koshi Province in eastern Nepal. Geographically, the project area spans across the administrative boundaries of Okhaldhunga and Solukhumbu districts, regions well known for their rich water resources and mountainous terrain that provide strong potential for sustainable hydropower generation.
+
+The project harnesses the flow of the Malun Khola, a perennial river system originating from the higher Himalayan catchments. The intake structure of the project is located in Malun Rural Municipality, specifically within Wards 6 and 7. This location has been carefully selected to optimize hydraulic head and ensure efficient diversion of river flow into the headrace system while maintaining environmental flow requirements downstream.
+
+From the intake, water is conveyed through a headrace system designed to maximize energy generation by utilizing the natural elevation difference between the intake and the powerhouse site. The powerhouse is situated in Ward 5 of Malun Rural Municipality, where the gross head available allows for the installation of generating units with a total installed capacity of 21 megawatts. After power generation, the water is safely returned to the river system through a tailrace channel, minimizing environmental impact.
               </p>
             </div>
           </div>
@@ -130,7 +135,7 @@ const ClientCarousel = async () => {
               data-aos="zoom-out-up" 
               src={`${baseUrl}uploads/aboutusimg/${aboutUsImages.firstCardImage}`}
               width={200} 
-              className='w-[50%]' 
+              className='w-[50%] mx-auto lg:mx-0' 
               height={200}   
               alt="Location map"
               unoptimized
