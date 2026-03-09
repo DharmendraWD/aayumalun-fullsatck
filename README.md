@@ -1,5 +1,5 @@
 Dynamic Next.js Website with Express & MySQL
-<img src="Capture.png" alt="Website Screenshot" />
+<img src="./Capture.png" alt="Website Screenshot" />
 
 # Dynamic Next.js Website with Express & MySQL
 
