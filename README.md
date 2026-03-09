@@ -2,11 +2,11 @@
 #
 
 ## Preview
-[link text](https://aayumalunhydro.com.np)
+[SEE WEBSITE](https://aayumalunhydro.com.np)
 <img src="./Capture.PNG" alt="Website Screenshot" />
 
 ## Admin Panel
-[link text](https://aayumalunhydro.com.np/admin/login)
+[SEE ADMIN PANEL](https://aayumalunhydro.com.np/admin/login)
 <img src="./Capture2.PNG" alt="Website Screenshot" />
  
 
