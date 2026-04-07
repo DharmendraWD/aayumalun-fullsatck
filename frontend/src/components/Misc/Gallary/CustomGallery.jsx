@@ -11,7 +11,7 @@ const CustomGallery = async () => {
       // Add cache options if needed
       // cache: 'no-store' for dynamic data
       // next: { revalidate: 3600 } for ISR
-      next: { revalidate: 3600 } // Revalidate every hour
+    cache: 'no-store'
     });
     
     if (!response.ok) {

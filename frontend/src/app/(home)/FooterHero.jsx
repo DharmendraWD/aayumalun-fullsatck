@@ -7,7 +7,7 @@ export default async function FooterHero() {
   try {
     const apiUrl = `${process.env.BASE_API}/contents/other`;
     const response = await fetch(apiUrl, {
-      next: { revalidate: 3600 } // Revalidate every hour
+     cache: 'no-store'
     });
     
     if (!response.ok) {

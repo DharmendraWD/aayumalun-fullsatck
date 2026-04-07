@@ -1080,6 +1080,122 @@ const deleteTeam = async (req, res) => {
   }
 };
 
+
+// edit team 
+const editTeam = async (req, res) => {
+  console.log("s")
+  const { id } = req.params;
+  const { name, description, designation } = req.body;
+  const newDp = req.file ? req.file.filename : null;
+
+  console.log(newDp)
+
+  try {
+    // 1. Check existing team member
+    const [existing] = await pool.query(
+      "SELECT * FROM team WHERE id = ?",
+      [id]
+    );
+
+    if (existing.length === 0) {
+      // delete uploaded file if user not found
+      if (newDp) {
+        const imgPath = path.join("uploads", "team", newDp);
+        if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+      }
+
+      return res.status(404).json({
+        success: false,
+        message: "Team member not found",
+      });
+    }
+
+    const oldDp = existing[0].dp;
+
+    // 2. Build dynamic query
+    let query = `
+      UPDATE team SET
+        name = ?,
+        description = ?,
+        designation = ?
+    `;
+
+    const values = [name, description, designation];
+
+    // only update dp if new image uploaded
+    if (newDp) {
+      query += `, dp = ?`;
+      values.push(newDp);
+    }
+
+    query += ` WHERE id = ?`;
+    values.push(id);
+
+    await pool.query(query, values);
+
+    // 3. Delete old image ONLY if new one uploaded
+    if (newDp && oldDp) {
+      const oldPath = path.join("uploads", "team", oldDp);
+      if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+    }
+
+    // 4. Get updated record
+    const [updated] = await pool.query(
+      "SELECT * FROM team WHERE id = ?",
+      [id]
+    );
+
+    return res.status(200).json({
+      success: true,
+      message: "Team member updated successfully",
+      data: updated[0],
+    });
+
+  } catch (error) {
+    console.error("Server Error:", error);
+
+    // cleanup new uploaded image on failure
+    if (newDp) {
+      const imgPath = path.join("uploads", "team", newDp);
+      if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: error.message || "Server error",
+    });
+  }
+};
+
+// get team by id 
+const getTeamById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [rows] = await pool.query(
+      "SELECT * FROM team WHERE id = ?",
+      [id]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "Team member not found",
+      });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Team member fetched successfully",
+      data: rows[0],
+    });
+  } catch (error) {
+    console.error("Server Error:", error);
+    return res.status(500).json({
+      success: false, message: error.message || "Server error",
+    
+    });
+  }
+
+};
+
 // TEAM SECTION END
 
 // GALLARY SECTION 
@@ -1820,4 +1936,4 @@ const getAllOther = async (req, res) => {
 module.exports = { createHeroSection, getHeroSection, createAboutUs, createAboutUsImage, createMissionImage, createMission, getAboutUs, getAboutUsImage, getMission, createTeam, getAllTeam, deleteTeam, createGallery, deleteGalleryImage, getGallery,createBlog, getallBlog, deleteBlog, editBlog, getAllClientMessage, deleteClientMessage, createClientMessage,   createFaq,
   getAllFaqs,
   updateFaq,
-  deleteFaq,other, getAllOther, createHeroImage, getallHeroImage, deleteHeroImage, deleteAboutUsImage, getMissionImages, deleteMissionImage, getBlogById };
+  deleteFaq,other, getAllOther, createHeroImage, getallHeroImage, deleteHeroImage, getTeamById, deleteAboutUsImage, getMissionImages, deleteMissionImage, getBlogById, editTeam };

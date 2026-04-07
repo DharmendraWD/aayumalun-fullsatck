@@ -99,6 +99,63 @@ export const deleteTeam = createAsyncThunk(
   }
 );
 
+// GET TEAM BY ID 
+export const getTeamById = createAsyncThunk(
+  "team/getById",
+  async (selectedTeamId, thunkAPI) => { 
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/contents/team/${selectedTeamId}`
+      );
+      console.log(res, "res")
+      const data = await res.json();
+
+      if (!res.ok) {
+        return thunkAPI.rejectWithValue(data.message || "Failed to fetch team");
+      }
+
+      return data?.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+
+// UPDATE TEAM
+export const updateTeam = createAsyncThunk(
+  "team/update",
+  async ({formData, selectedTeamId},thunkAPI) => {
+    try {
+             const token = getCookie('token'); // read from cookie
+
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_API}/contents/team/${selectedTeamId}`,
+        {
+          method: "PUT",
+           headers: {
+          Authorization: `Bearer ${token}`, // send token manually
+        },
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        toast.error(data.message || "Failed to update team member");
+        return thunkAPI.rejectWithValue(data.message);
+      }
+
+      toast.success(data.message || "Team member updated successfully");
+      thunkAPI.dispatch(getAllTeam());
+      return data.data;
+    } catch (err) {
+      toast.error(err.message);
+      return thunkAPI.rejectWithValue(err.message);
+    }
+  }
+);
+    
 /* ============================
    SLICE
 ============================ */
@@ -106,6 +163,7 @@ const teamSlice = createSlice({
   name: "team",
   initialState: {
     teamData: [],
+      selectedTeam: null,
     loading: false,
     error: null,
   },
@@ -148,6 +206,43 @@ const teamSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+      // GET TEAM BY ID
+      builder
+      .addCase(getTeamById.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getTeamById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.selectedTeam = action.payload;
+      })
+      .addCase(getTeamById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      });
+
+      // UPDATE TEAM
+      builder
+.addCase(updateTeam.pending, (state) => {
+  state.loading = true;
+})
+.addCase(updateTeam.fulfilled, (state, action) => {
+  state.loading = false;
+
+  // 🔥 update in real-time (no refresh needed)
+  const updated = action.payload;
+  const index = state.teamData.findIndex(
+    (item) => item.id === updated.id
+  );
+
+  if (index !== -1) {
+    state.teamData[index] = updated;
+  }
+})
+.addCase(updateTeam.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+});
   },
 });
 

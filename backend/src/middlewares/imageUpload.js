@@ -22,6 +22,14 @@ const storage = multer.diskStorage({
     // For /api/users, it extracts 'users'
     // For /api/blogs, it extracts 'blogs'
     const routeParts = req.originalUrl.split('/');
+    
+// routeParts =[ '', 'api', 'contents', 'team', '13' ]
+
+if (routeParts.includes("team") && routeParts.length > 4 || routeParts.includes("blogs")) {
+  routeParts.splice(-1, 1); 
+}
+
+    console.log(routeParts)
     const section = routeParts[routeParts.length - 1]; // Gets the last part of the URL
     
     console.log("Detected section:", section);

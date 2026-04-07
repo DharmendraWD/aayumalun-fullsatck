@@ -14,7 +14,7 @@ async function getTeamMembers() {
   try {
     const apiUrl = `${process.env.NEXT_PUBLIC_BASE_API}/contents/team`;
     const response = await fetch(apiUrl, {
-      next: { revalidate: 3600 } // Revalidate every hour
+       cache: 'no-store'
     });
     
     if (!response.ok) {

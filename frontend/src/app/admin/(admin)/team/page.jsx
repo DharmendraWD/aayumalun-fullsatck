@@ -16,14 +16,18 @@ import {
   createTeam,
   deleteTeam,
 } from "../redux/slices/teamSlice/teamSlice";
+import { CiEdit } from "react-icons/ci";
 import Loading from "../components/Loading";
 import toast from "react-hot-toast";
 import DestroyerPopup from "../components/DestroyerPopup";
 import Image from "next/image";
+import {getTeamById} from "../redux/slices/teamSlice/teamSlice";
+import { updateTeam } from "../redux/slices/teamSlice/teamSlice";
 
 export default function TeamPage() {
   const dispatch = useDispatch();
   const teamData = useSelector((state) => state.team.teamData);
+  const selectedTeamData = useSelector((state) => state.team?.selectedTeam);
   const loading = useSelector((state) => state.team.loading);
 
   /* ============================
@@ -31,6 +35,7 @@ export default function TeamPage() {
   ============================ */
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [isediting  , setisediting] = useState(false);
   const [newMember, setNewMember] = useState({
     name: "",
     description: "",
@@ -94,6 +99,7 @@ export default function TeamPage() {
   // Handle Delete
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [memberToDelete, setMemberToDelete] = useState(null);
+  const [selectedTeamId, setselectedTeamId] = useState("");
 
   const confirmDelete = async () => {
     if (memberToDelete) {
@@ -112,6 +118,63 @@ export default function TeamPage() {
      RENDER
   ============================ */
   // console.log(teamData)
+
+  // when click on edit team 
+useEffect(() => {
+  if(selectedTeamId){
+    dispatch(getTeamById(selectedTeamId))
+    // console.log("first")
+  }
+
+  
+}, [selectedTeamId])
+
+console.log(selectedTeamData)
+
+// show image preview in edit popup when click on edit button
+useEffect(() => {
+  if (selectedTeamData && isediting) {
+    setNewMember({
+      name: selectedTeamData?.name || "",
+      description: selectedTeamData?.description || "",
+      designation: selectedTeamData?.designation || "",
+    });
+
+    // set existing image preview
+    setSelectedFile({
+      preview:
+        process.env.NEXT_PUBLIC_BASE_CONTENT_URL +
+        "uploads/team/" +
+        selectedTeamData.dp,
+      isExisting: true,
+    });
+  }
+}, [selectedTeamData, isediting]);
+
+
+// update team member handler
+  const handleUpdateTeamMember = () => {
+    setisediting(false)
+    if (!newMember.name || !newMember.description || !newMember.designation) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("name", newMember.name);
+    formData.append("description", newMember.description);
+    formData.append("designation", newMember.designation);
+   if (selectedFile?.file) {
+  formData.append("dp", selectedFile.file);
+} else {
+  formData.append("dp", selectedTeamData.dp);
+}
+
+    dispatch(updateTeam({formData, selectedTeamId}));
+    setSelectedFile(null);
+    setNewMember({ name: "", description: "", designation: "" });
+  };
+
 
   return (
     <>
@@ -171,13 +234,25 @@ export default function TeamPage() {
                     >
                       <HiOutlineTrash size={20} />
                     </button>
+                    <button
+                      onClick={() =>
+                      {
+                         setisediting(true)
+                          setselectedTeamId(member?.id)
+                      }
+                        
+                        }
+                      className="p-3 bg-blue-600 text-white rounded-full hover:scale-110 transition-transform shadow-lg"
+                    >
+                      <CiEdit size={20} />
+                    </button>
                   </div>
                 </div>
 
                 {/* Content Section */}
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-slate-800 mb-2 truncate">
-                    {member.name}nb
+                    {member.name}
                   </h3>
                   <p className="text-sm text-slate-500 line-clamp-2">
                     {member.designation}
@@ -229,6 +304,8 @@ export default function TeamPage() {
             setIsAddModalOpen(false);
             setSelectedFile(null);
             setNewMember({ name: "", description: "", designation: "" });
+            setselectedTeamId(null);
+            
           }}
           title="Add New Team Member"
           primaryAction={handleCreateTeamMember}
@@ -292,7 +369,7 @@ export default function TeamPage() {
               </label>
               <input
                 type="text"
-                value={newMember.name}
+                value={newMember.name || ""}
                 onChange={(e) =>
                   setNewMember({ ...newMember, name: e.target.value })
                 }
@@ -334,6 +411,123 @@ export default function TeamPage() {
             </div>
           </div>
         </DestroyerPopup>
+
+
+        {/* EDIT POPUP  */}
+           <DestroyerPopup
+          isOpen={isediting}
+          onClose={() => {
+            setisediting(false);
+            setSelectedFile(null);
+            setNewMember({ name: "", description: "", designation: "" });
+            setselectedTeamId(null);
+          }}
+          title="Update Team Member"
+          primaryAction={handleUpdateTeamMember}
+          actionText="Update"
+        >
+          <div className="space-y-5">
+            {/* Image Upload Area */}
+            <div
+              onClick={() => fileInputRef.current.click()}
+              className="border-2 border-dashed border-slate-200 rounded-3xl p-6 flex flex-col items-center justify-center text-slate-500 hover:bg-slate-50 transition-all cursor-pointer min-h-[200px] relative overflow-hidden group"
+            >
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                
+                className="hidden"
+                accept="image/*"
+              />
+
+              {!selectedFile ? (
+                <div className="text-center animate-in fade-in duration-300">
+                  <HiOutlinePhotograph
+                    size={48}
+                    className="text-slate-300 mb-3 mx-auto group-hover:text-indigo-400 transition-colors"
+                  />
+                  <p className="font-semibold text-sm text-slate-600 mb-1">
+                    Click to select profile picture
+                  </p>
+                  <p className="text-xs text-slate-400 uppercase tracking-wider">
+                    PNG, JPG (Max 5MB)
+                  </p>
+                </div>
+              ) : (
+                <div className="w-full animate-in zoom-in-95 duration-300 text-center">
+                  <div className="relative mx-auto w-32 h-32 mb-3">
+                    <img
+                      src={selectedFile.preview}
+                      alt="Preview"
+                      className="w-full h-full object-cover rounded-2xl shadow-lg border-4 border-white"
+                    />
+                    <button
+                      type="button"
+                      onClick={clearSelection}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow-md hover:bg-red-600 transition-all"
+                    >
+                      <HiOutlineX size={16} />
+                    </button>
+                  </div>
+                  <p className="text-xs font-bold text-indigo-500 truncate max-w-[200px] mx-auto bg-indigo-50 px-3 py-1 rounded-lg">
+                    {selectedFile.name}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Name Input */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                <HiOutlineUser className="text-indigo-500" />
+                Name
+              </label>
+              <input
+                type="text"
+                value={newMember.name || ""}
+                onChange={(e) =>
+                  setNewMember({ ...newMember, name: e.target.value })
+                }
+                placeholder="Enter member name"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              />
+            </div>
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                <HiOutlineUser className="text-indigo-500" />
+                Designation
+              </label>
+              <input
+                type="text"
+                value={newMember.designation || ""}
+                onChange={(e) =>
+                  setNewMember({ ...newMember, designation: e.target.value })
+                }
+                placeholder="Enter member name"
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+              />
+            </div>
+
+            {/* Description Input */}
+            <div>
+              <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                <HiOutlineDocumentText className="text-indigo-500" />
+                Description
+              </label>
+              <textarea
+                value={newMember.description || ""}
+                onChange={(e) =>
+                  setNewMember({ ...newMember, description: e.target.value })
+                }
+                placeholder="Enter member description or role"
+                rows={4}
+                className="w-full px-4 py-3 rounded-2xl border border-slate-200 bg-slate-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all resize-none"
+              />
+            </div>
+          </div>
+        </DestroyerPopup>
+
       </div>
     </>
   );

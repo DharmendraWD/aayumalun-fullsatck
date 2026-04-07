@@ -1,5 +1,5 @@
 const express = require("express");
-const {createHeroSection, getHeroSection, deleteHeroSectionImage, createAboutUs, createAboutUsImage, createMissionImage, createMission, getAboutUs, getAboutUsImage, getMission, getMissionImage, createTeam, getAllTeam, deleteTeam, createGallery, deleteGalleryImage, getGallery, createBlog, getallBlog, deleteBlog, editBlog, getAllClientMessage, deleteClientMessage, createClientMessage, createFaq, getAllFaqs, updateFaq, deleteFaq, other, getAllOther, createHeroImage, getallHeroImage, deleteHeroImage, deleteAboutUsImage, getMissionImages, deleteMissionImage, getBlogById} = require("../controllers/contents.controller");
+const {createHeroSection, getHeroSection, deleteHeroSectionImage, createAboutUs, editTeam, createAboutUsImage, createMissionImage, createMission, getAboutUs, getAboutUsImage, getMission, getMissionImage, createTeam, getAllTeam, deleteTeam, createGallery, deleteGalleryImage, getGallery, createBlog, getallBlog, deleteBlog, editBlog, getAllClientMessage, deleteClientMessage, createClientMessage, createFaq, getAllFaqs, updateFaq, deleteFaq, other, getAllOther, createHeroImage, getallHeroImage, deleteHeroImage, deleteAboutUsImage, getMissionImages, deleteMissionImage, getBlogById, getTeamById} = require("../controllers/contents.controller");
 const upload = require("../middlewares/imageUpload");
 const {isAuthenticated} = require("../middlewares/isAuthenticated");
 
@@ -53,13 +53,15 @@ router.delete("/missionimg/:imageType", isAuthenticated, deleteMissionImage);
 // MISSION SECTION END
 
 // TEAM SECTION 
-router.post("/team", upload.single("dp"), createTeam);
+router.post("/team", isAuthenticated, upload.single("dp"), createTeam);
 router.get("/team", getAllTeam);
-router.delete("/team/:id", deleteTeam);
+router.delete("/team/:id", isAuthenticated, deleteTeam);
+router.put("/team/:id", isAuthenticated, upload.single("dp"), editTeam);
+router.get("/team/:id", getTeamById);
 // TEAM SECTION ENDED 
 
 // GALLERY SECTION 
-router.post("/gallery", upload.array("image"),isAuthenticated, createGallery);
+router.post("/gallery", isAuthenticated, upload.array("image"), createGallery);
 router.get("/gallery", getGallery);
 router.delete("/gallery/:imageName", isAuthenticated, deleteGalleryImage);
 // GALLERY SECTION END

@@ -8,12 +8,12 @@ async function getMissionData() {
   try {
     const [missionResponse, imagesResponse] = await Promise.all([
       fetch(`${process.env.BASE_API}/contents/mission`, { 
-        cache: 'force-cache',
-        next: { revalidate: 3600 } // Revalidate every hour
+        cache: 'no-store',
+       
       }),
       fetch(`${process.env.BASE_API}/contents/missionimg`, { 
-        cache: 'force-cache',
-        next: { revalidate: 3600 }
+        cache: 'no-store',
+     
       })
     ]);
 

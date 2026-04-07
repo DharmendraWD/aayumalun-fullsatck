@@ -8,8 +8,8 @@ async function getHeroData() {
   try {
     const res = await fetch(
       `${process.env.BASE_API}/contents/herosection`,
-      {
-        next: { revalidate: 60 } // Revalidate every 60 seconds
+     {
+       cache: 'no-store'
       }
     );
 
@@ -31,7 +31,7 @@ async function getHeroImages() {
     const res = await fetch(
       `${process.env.BASE_API}/contents/herosectionimg`,
       {
-        next: { revalidate: 60 }
+       cache: 'no-store'
       }
     );
 
